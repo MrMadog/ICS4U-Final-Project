@@ -27,6 +27,7 @@ namespace ICS4U_Final_Project
         List<Button> buttons;
         List<Bullet> bullets;
         List<Trail> planeTrail;
+        List<EnemyPlane> enemeyPlanes;
  
         Texture2D planeTexture, targetTexture, coinTexture, cursorTexture, bulletTexture, planeTrailTexture;
         Texture2D plusButtonTexture, plusButtonTextureP, minusButtonTexture, minusButtonTextureP, dimScreen;
@@ -86,6 +87,7 @@ namespace ICS4U_Final_Project
             buttons = new List<Button>();
             bullets = new List<Bullet>();
             planeTrail = new List<Trail>();
+            enemeyPlanes = new List<EnemyPlane>();
 
             planeLocation = new Vector2(540, 800);
 
@@ -344,6 +346,7 @@ namespace ICS4U_Final_Project
                 }
             }
 
+            
             // - bullets
             if (keyboardState.IsKeyDown(Keys.Space) && prevKeyboardState.IsKeyUp(Keys.Space))
             {
@@ -363,6 +366,14 @@ namespace ICS4U_Final_Project
             {
                 foreach (Bullet bullet in bullets)
                     bullet.Update();
+            }
+
+            // - enemies
+            for (int i = 0; i < 100; i++)
+            {
+                if (i == 50)
+                    enemeyPlanes.Add(new EnemyPlane(planeTexture, bulletTexture, 2));
+
             }
 
 
@@ -475,6 +486,12 @@ namespace ICS4U_Final_Project
 
             // - plane
             _spriteBatch.Draw(planeTexture, planeLocation, null, Color.White, angle, origin, 1f, SpriteEffects.None, 0f);
+
+            // - enemy planes
+            foreach (EnemyPlane plane in enemeyPlanes)
+                plane.Draw(_spriteBatch);
+
+
 
             // - hud points
             _spriteBatch.DrawString(pointsFont, $"Points :  {points}", new Vector2(40, 40), Color.Black);
