@@ -1,0 +1,16 @@
+﻿
+
+	IDEAS:
+		
+		- Have a plane trail (spawn a circle at the back of the plane, and then make it smaller and fade away)
+		- Have a choose plane option at main menu
+		- Have plane go towards cursor unless left button clicked(creates target)
+		- If right button clicked, make target the mouse cursor again(used to dodge enemies)
+		- Keep plane moving in direction of target or instantly move target back to mouse
+
+		enemy ideas:
+			- planes flying across the screen randomly
+			- people or things on the ground shooting up at my plane
+			- my plane able to shoot at other planes, or drop bombs on ground units
+			- maybe an upgrade menu and point system
+			- some sort of coin collecting objective, flag retrieving, package dropping... etc.

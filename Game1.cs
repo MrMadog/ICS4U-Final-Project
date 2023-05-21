@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 
-namespace Final_Project_ICS4U
+namespace ICS4U_Final_Project
 {
     public class Game1 : Game
     {
@@ -105,14 +105,17 @@ namespace Final_Project_ICS4U
 
             if (screen == Screen.Game)
             {
-                // - making a target on mouse click
-                if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released)
-                {
-                    target = new Vector2(mouseState.X, mouseState.Y);
-                    targetCircle = new Circle(target, 3);
-                    targetBool = true;
-                    angle = GetAngle(planeLocation, new Vector2(target.X, target.Y));
-                    targetRect = new Rectangle((int)target.X - 7, (int)target.Y - 7, 50, 50);
+                // - checking if mouse is in screen when target is attempted to be created
+                if (mousePos.X > 0 && mousePos.X < 1080 && mousePos.Y > 0 && mousePos.Y < 720)
+                { // - making a target on mouse click
+                    if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released)
+                    {
+                        target = new Vector2(mouseState.X, mouseState.Y);
+                        targetCircle = new Circle(target, 5);
+                        targetBool = true;
+                        angle = GetAngle(planeLocation, new Vector2(target.X, target.Y));
+                        targetRect = new Rectangle((int)target.X - 25, (int)target.Y - 45, 50, 50);
+                    }
                 }
 
                 // - cancel target and make cursor target again
@@ -141,6 +144,15 @@ namespace Final_Project_ICS4U
                     planeLocation = prevPlaneLocation;
                 }
 
+                // - if plane reaches target >> target = mouse again
+                if (targetBool == true)
+                {
+                    if (targetCircle.Contains(planeLocation))
+                    {
+                        targetBool = false;
+                    }
+                }
+
                 // previous action things
                 prevPlaneLocation = planeLocation;
                 prevAngle = angle;
@@ -152,7 +164,6 @@ namespace Final_Project_ICS4U
 
             }
 
-
             base.Update(gameTime);
         }
 
@@ -162,11 +173,23 @@ namespace Final_Project_ICS4U
 
             _spriteBatch.Begin();
 
-            if (targetBool == true)
-                _spriteBatch.Draw(targetTexture, targetRect, Color.White);
+            if (screen == Screen.Intro)
+            {
 
-            _spriteBatch.Draw(planeTexture, planeLocation, null, Color.White, angle, origin, 1f, SpriteEffects.None, 0f);
+            }
 
+            if (screen == Screen.Game)
+            {
+                if (targetBool == true)
+                    _spriteBatch.Draw(targetTexture, targetRect, Color.White);
+
+                _spriteBatch.Draw(planeTexture, planeLocation, null, Color.White, angle, origin, 1f, SpriteEffects.None, 0f);
+            }
+
+            if (screen == Screen.Outro)
+            {
+
+            }
             _spriteBatch.End();
 
             base.Draw(gameTime);
