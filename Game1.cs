@@ -22,15 +22,17 @@ namespace ICS4U_Final_Project
 
         }
 
+        Random generator = new Random();
 
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        Texture2D planeTexture, targetTexture;
+        Texture2D planeTexture, targetTexture, coinTexture;
 
-        Rectangle targetRect;
+        Rectangle targetRect, coinRect;
 
         MouseState mouseState, prevMouseState;
+        KeyboardState keyboardState;
 
         float angle, prevAngle;
 
@@ -41,13 +43,17 @@ namespace ICS4U_Final_Project
             Intro, Game, Outro
         }
 
+        int coinSpawnX, coinSpawnY, points, totalPoints;
+
         Screen screen;
 
-        Vector2 origin, planeLocation, prevPlaneLocation, mousePos, direction, target;
+        Vector2 origin, planeLocation, prevPlaneLocation, mousePos, direction, target, coinSpawnCircle;
 
-        Circle mouseCircle, targetCircle;
+        Circle mouseCircle, targetCircle, coinCircle;
 
         bool targetBool = false;
+
+        SpriteFont pointsFont;
 
         public Game1()
         {
@@ -66,7 +72,12 @@ namespace ICS4U_Final_Project
 
             Mouse.SetPosition(540, 360);
 
-            planeLocation = new Vector2(300, 400);
+            planeLocation = new Vector2(540, 800);
+
+            coinSpawnX = generator.Next(50, 1020);
+            coinSpawnY = generator.Next(50, 300);
+
+            coinRect = new Rectangle(coinSpawnX, coinSpawnY, 30, 30);
 
             base.Initialize();
         }
@@ -77,16 +88,15 @@ namespace ICS4U_Final_Project
 
             planeTexture = Content.Load<Texture2D>("plane");
             targetTexture = Content.Load<Texture2D>("target");
-
+            coinTexture = Content.Load<Texture2D>("circle");
+            pointsFont = Content.Load<SpriteFont>("points");
 
         }
 
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
-
             mouseState = Mouse.GetState();
+            keyboardState = Keyboard.GetState();
 
             int x = mouseState.X;
             int y = mouseState.Y;
@@ -96,7 +106,10 @@ namespace ICS4U_Final_Project
 
             screen = Screen.Game;
 
+            coinSpawnCircle = new Vector2(coinSpawnX + coinRect.Width / 2, coinSpawnY + coinRect.Height / 2);
+
             mouseCircle = new Circle(mousePos, 10);
+            coinCircle = new Circle(coinSpawnCircle, 30);
 
             if (screen == Screen.Intro)
             {
@@ -120,9 +133,7 @@ namespace ICS4U_Final_Project
 
                 // - cancel target and make cursor target again
                 if (mouseState.RightButton == ButtonState.Pressed && prevMouseState.RightButton == ButtonState.Released)
-                {
                     targetBool = false;
-                }
 
                 // - checking if there is a target
                 if (targetBool == false)
@@ -132,10 +143,16 @@ namespace ICS4U_Final_Project
                 }
 
                 // - rotation, direction and movement of plane
-                Vector2 direction = target - planeLocation;
+                direction = target - planeLocation;
                 direction.Normalize();
                 origin = new Vector2(planeTexture.Width / 2, planeTexture.Height / 2);
-                planeLocation += direction * 2;
+                
+                // - boost
+                if (keyboardState.IsKeyDown(Keys.Space))
+                    planeLocation += direction * 2;
+
+                else
+                    planeLocation += direction;
 
                 // - once plane reaches cursor, rotation and movement stops
                 if (mouseCircle.Contains(planeLocation))
@@ -146,17 +163,25 @@ namespace ICS4U_Final_Project
 
                 // - if plane reaches target >> target = mouse again
                 if (targetBool == true)
-                {
                     if (targetCircle.Contains(planeLocation))
-                    {
                         targetBool = false;
-                    }
-                }
 
                 // previous action things
                 prevPlaneLocation = planeLocation;
                 prevAngle = angle;
                 prevMouseState = mouseState;
+
+                // coins
+                if (coinCircle.Contains(planeLocation))
+                {
+                    coinSpawnX = generator.Next(60, 1020);
+                    coinSpawnY = generator.Next(60, 660);
+
+                    coinRect = new Rectangle(coinSpawnX, coinSpawnY, 30, 30);
+
+                    points += 100;
+                    totalPoints += 100;
+                }
             }
 
             if (screen == Screen.Outro)
@@ -180,10 +205,14 @@ namespace ICS4U_Final_Project
 
             if (screen == Screen.Game)
             {
+                _spriteBatch.Draw(coinTexture, coinRect, Color.White);
+
                 if (targetBool == true)
                     _spriteBatch.Draw(targetTexture, targetRect, Color.White);
 
                 _spriteBatch.Draw(planeTexture, planeLocation, null, Color.White, angle, origin, 1f, SpriteEffects.None, 0f);
+
+                _spriteBatch.DrawString(pointsFont, $"Points :  {points}", new Vector2(40, 60), Color.Black);
             }
 
             if (screen == Screen.Outro)
