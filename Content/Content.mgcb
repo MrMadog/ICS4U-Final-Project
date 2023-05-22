@@ -56,6 +56,18 @@
 /processorParam:TextureFormat=Color
 /build:minusbuttonnotpressed.png
 
+#begin minusbuttonpressed.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:minusbuttonpressed.png
+
 #begin plane.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -80,6 +92,18 @@
 /processorParam:TextureFormat=Color
 /build:plusbuttonnotpressed.png
 
+#begin plusbuttonpressed.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:plusbuttonpressed.png
+
 #begin pointNumbers.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
@@ -94,6 +118,18 @@
 /processorParam:TextureFormat=Compressed
 /build:points.spritefont
 
+#begin rectangle.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:rectangle.png
+
 #begin target.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -105,4 +141,11 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:target.png
+
+#begin upgrade menu.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:upgrade menu.spritefont
 

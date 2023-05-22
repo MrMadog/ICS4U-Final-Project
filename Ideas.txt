@@ -13,6 +13,8 @@
 		- 3D clickable buttons
 		- total points earned on end screen
 		- maybe have ammo that you can pick up and use
+		- possible button class (making it easier to draw and way less code)
+			- if button.Pressed()
 
 	Enemy Ideas:
 		- Planes flying across the screen randomly
@@ -34,3 +36,4 @@
 		- Ammo(bullets, maybe max capacity)
 		- Health
 		- Bombs
+		- 

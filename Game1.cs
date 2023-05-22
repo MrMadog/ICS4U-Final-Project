@@ -39,8 +39,11 @@ namespace ICS4U_Final_Project
 
         Texture2D planeTexture, targetTexture, coinTexture, cursorTexture;
         Texture2D plusButtonTexture, plusButtonTextureP, minusButtonTexture, minusButtonTextureP;
+        Texture2D plusButton, minusButton, plusButton1, minusButton1, plusButton2, minusButton2, dimScreen;
 
-        Rectangle targetRect, coinRect, cursorRect, plusButtonRect, minusButtonRect;
+        Rectangle targetRect, coinRect, cursorRect;
+        Rectangle plusButtonRect, minusButtonRect, plusButtonRect1, minusButtonRect1, plusButtonRect2, minusButtonRect2;
+        Rectangle dimScreenRect;
 
         MouseState mouseState, prevMouseState;
         KeyboardState keyboardState;
@@ -66,8 +69,9 @@ namespace ICS4U_Final_Project
         bool targetBool = false;
         bool coinPointsBool = false;
         bool menuOpenBool = false;
+        bool buttonHover = false;
 
-        SpriteFont pointsFont, pointNumbers, followingFont;
+        SpriteFont pointsFont, pointNumbers, followingFont, upgradeMenuFont;
 
         public Game1()
         {
@@ -98,8 +102,14 @@ namespace ICS4U_Final_Project
             boostAmount = 200;
             totalBoost = boostAmount;
 
-            plusButtonRect = new Rectangle(200, 300, 72, 72);
-            minusButtonRect = new Rectangle(200, 400, 72, 72);
+            plusButtonRect = new Rectangle(700, 300, 36, 36);
+            minusButtonRect = new Rectangle(650, 300, 36, 36);
+            plusButtonRect1 = new Rectangle(700, 380, 36, 36);
+            minusButtonRect1 = new Rectangle(650, 380, 36, 36);
+            plusButtonRect2 = new Rectangle(700, 460, 36, 36);
+            minusButtonRect2 = new Rectangle(650, 460, 36, 36);
+
+            dimScreenRect = new Rectangle(0, 0, 1080, 720);
 
             base.Initialize();
         }
@@ -115,11 +125,15 @@ namespace ICS4U_Final_Project
             cursorTexture = Content.Load<Texture2D>("cursor");
             plusButtonTexture = Content.Load<Texture2D>("plusbuttonnotpressed");
             minusButtonTexture = Content.Load<Texture2D>("minusbuttonnotpressed");
+            plusButtonTextureP = Content.Load<Texture2D>("plusbuttonpressed");
+            minusButtonTextureP = Content.Load<Texture2D>("minusbuttonpressed");
+            dimScreen = Content.Load<Texture2D>("rectangle");
 
             // - fonts
             pointsFont = Content.Load<SpriteFont>("points");
             pointNumbers = Content.Load<SpriteFont>("pointNumbers");
             followingFont = Content.Load<SpriteFont>("following");
+            upgradeMenuFont = Content.Load<SpriteFont>("upgrade menu");
 
         }
 
@@ -145,6 +159,15 @@ namespace ICS4U_Final_Project
 
             cursorRect.X = mouseState.X - 16;
             cursorRect.Y = mouseState.Y - 16;
+
+            plusButton = plusButtonTexture;
+            minusButton = minusButtonTexture;
+            plusButton1 = plusButtonTexture;
+            minusButton1 = minusButtonTexture;
+            plusButton2 = plusButtonTexture;
+            minusButton2 = minusButtonTexture;
+
+            buttonHover = false;
 
             if (screen == Screen.Intro)
             {
@@ -223,6 +246,43 @@ namespace ICS4U_Final_Project
                     planeLocation = prevPlaneLocation;
                     boostAmount = prevBoostAmount;
 
+                    if (minusButtonRect.Contains(mouse) || plusButtonRect.Contains(mouse) || minusButtonRect1.Contains(mouse) || plusButtonRect1.Contains(mouse) || minusButtonRect2.Contains(mouse) || plusButtonRect2.Contains(mouse))
+                    {
+                        buttonHover = true;
+
+                        if (plusButtonRect.Contains(mouse))
+                            if (mouseState.LeftButton == ButtonState.Pressed)
+                            {
+                                plusButton = plusButtonTextureP;
+                                if (points >= 100)
+                                    points -= 100;
+                            }                                
+                        if (minusButtonRect.Contains(mouse))
+                            if (mouseState.LeftButton == ButtonState.Pressed)
+                                minusButton = minusButtonTextureP;
+
+                        if (plusButtonRect1.Contains(mouse))
+                            if (mouseState.LeftButton == ButtonState.Pressed)
+                            {
+                                plusButton1 = plusButtonTextureP;
+                                if (points >= 100)
+                                {
+                                    points -= 100;
+                                    totalBoost += 100;
+                                }                                    
+                            }
+
+                        if (minusButtonRect1.Contains(mouse))
+                            if (mouseState.LeftButton == ButtonState.Pressed)
+                                minusButton1 = minusButtonTextureP;
+
+                        if (plusButtonRect2.Contains(mouse))
+                            if (mouseState.LeftButton == ButtonState.Pressed)
+                                plusButton2 = plusButtonTextureP;
+                        if (minusButtonRect2.Contains(mouse))
+                            if (mouseState.LeftButton == ButtonState.Pressed)
+                                minusButton2 = minusButtonTextureP;
+                    }
 
                 }
 
@@ -297,9 +357,6 @@ namespace ICS4U_Final_Project
                 if (seconds < 3 && coinPointsBool == true)
                     _spriteBatch.DrawString(pointNumbers, "+100", coinPoints, Color.White);
 
-                // - cursor
-                _spriteBatch.Draw(cursorTexture, cursorRect, Color.White);
-
                 // - boost amount
                 _spriteBatch.DrawString(pointsFont, boostAmount.ToString(), new Vector2(40, 100), Color.White);
 
@@ -310,12 +367,31 @@ namespace ICS4U_Final_Project
                     _spriteBatch.DrawString(followingFont, "Following: Cursor", new Vector2(40, 150), Color.White);
 
 
-
-                // where i left off vvvvvvvvvvvvvvvvv 
+                // - upgrade menu
                 if (menuOpenBool == true)
                 {
-                    _spriteBatch.Draw(plusButtonTexture, plusButtonRect, Color.White);
+                    _spriteBatch.Draw(dimScreen, dimScreenRect, Color.Black * 0.3f);
+
+                    // - row 1
+                    _spriteBatch.Draw(plusButton, plusButtonRect, Color.White);
+                    _spriteBatch.Draw(minusButton, minusButtonRect, Color.White);
+                    _spriteBatch.DrawString(upgradeMenuFont, "Health   ...................................", new Vector2(300, 310), Color.White);
+
+                    // - row 2
+                    _spriteBatch.Draw(plusButton1, plusButtonRect1, Color.White);
+                    _spriteBatch.Draw(minusButton1, minusButtonRect1, Color.White);
+                    _spriteBatch.DrawString(upgradeMenuFont, "Boost     ...................................", new Vector2(300, 390), Color.White);
+
+                    // - row 3
+                    _spriteBatch.Draw(plusButton2, plusButtonRect2, Color.White);
+                    _spriteBatch.Draw(minusButton2, minusButtonRect2, Color.White);
+                    _spriteBatch.DrawString(upgradeMenuFont, "Ammo       ...................................", new Vector2(300, 470), Color.White);
                 }
+
+                // - cursor
+                _spriteBatch.Draw(cursorTexture, cursorRect, Color.White);
+                if (buttonHover == true)
+                    _spriteBatch.Draw(cursorTexture, cursorRect, Color.Black);
             }
 
             if (screen == Screen.Outro)
