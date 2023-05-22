@@ -22,14 +22,6 @@ namespace ICS4U_Final_Project
 
         }
 
-        /*
-            to create a new colour: (not working)
-        byte redValue = 100;
-        byte greenValue = 100;
-        byte blueValue = 100;
-        Color hello = new Color(redValue, greenValue, blueValue);
-        */
-
 
 
         Random generator = new Random();
