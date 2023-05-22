@@ -11,9 +11,8 @@
 		- UI Sounds
 		- Hover over button sound effect and visual effect
 		- 3D clickable buttons
-		- points ("+100") appearing every kill or coin collected moving up left
-		- damage ("30") appearing every hit to enemy moving down right 
 		- total points earned on end screen
+		- maybe have ammo that you can pick up and use
 
 	Enemy Ideas:
 		- Planes flying across the screen randomly
@@ -22,9 +21,16 @@
 		- Maybe an upgrade menu and point system
 		- Some sort of coin collecting objective, flag retrieving, package dropping... etc.
 		- maybe use a class for enemy planes (maybe part of a class for user plane aswell)
+		- points ("100") appearing every kill or coin gotten moving up left
+		- damage ("30") appearing every hit to enemy moving down right
 
 	Menu Screen: 
 		- start button, quit game button, keybinds settings, choose plane button
 		- ability to change keybinds
 		- maybe a how-to-play button that shows keybinds
 
+	Upgrade Menu:
+		- Boost upgrades (duration, maybe speed)
+		- Ammo(bullets, maybe max capacity)
+		- Health
+		- Bombs

@@ -22,19 +22,30 @@ namespace ICS4U_Final_Project
 
         }
 
+        /*
+            to create a new colour: (not working)
+        byte redValue = 100;
+        byte greenValue = 100;
+        byte blueValue = 100;
+        Color hello = new Color(redValue, greenValue, blueValue);
+        */
+
+
+
         Random generator = new Random();
 
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        Texture2D planeTexture, targetTexture, coinTexture;
+        Texture2D planeTexture, targetTexture, coinTexture, cursorTexture;
+        Texture2D plusButtonTexture, plusButtonTextureP, minusButtonTexture, minusButtonTextureP;
 
-        Rectangle targetRect, coinRect;
+        Rectangle targetRect, coinRect, cursorRect, plusButtonRect, minusButtonRect;
 
         MouseState mouseState, prevMouseState;
         KeyboardState keyboardState;
 
-        float angle, prevAngle;
+        float angle, prevAngle, seconds, startTime;
 
         Point mouse;
 
@@ -44,22 +55,25 @@ namespace ICS4U_Final_Project
         }
 
         int coinSpawnX, coinSpawnY, points, totalPoints;
+        int boostAmount, prevBoostAmount, totalBoost;
 
         Screen screen;
 
-        Vector2 origin, planeLocation, prevPlaneLocation, mousePos, direction, target, coinSpawnCircle;
+        Vector2 origin, planeLocation, prevPlaneLocation, planeShadowLocation, mousePos, direction, target, coinSpawnCircle, coinPoints;
 
         Circle mouseCircle, targetCircle, coinCircle;
 
         bool targetBool = false;
+        bool coinPointsBool = false;
+        bool menuOpenBool = false;
 
-        SpriteFont pointsFont;
+        SpriteFont pointsFont, pointNumbers, followingFont;
 
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            IsMouseVisible = true;
+            IsMouseVisible = false;
         }
 
         protected override void Initialize()
@@ -79,17 +93,33 @@ namespace ICS4U_Final_Project
 
             coinRect = new Rectangle(coinSpawnX, coinSpawnY, 30, 30);
 
+            cursorRect = new Rectangle(0, 0, 32, 32);
+
+            boostAmount = 200;
+            totalBoost = boostAmount;
+
+            plusButtonRect = new Rectangle(200, 300, 72, 72);
+            minusButtonRect = new Rectangle(200, 400, 72, 72);
+
             base.Initialize();
         }
 
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-
+            
+            // - textures
             planeTexture = Content.Load<Texture2D>("plane");
             targetTexture = Content.Load<Texture2D>("target");
             coinTexture = Content.Load<Texture2D>("circle");
+            cursorTexture = Content.Load<Texture2D>("cursor");
+            plusButtonTexture = Content.Load<Texture2D>("plusbuttonnotpressed");
+            minusButtonTexture = Content.Load<Texture2D>("minusbuttonnotpressed");
+
+            // - fonts
             pointsFont = Content.Load<SpriteFont>("points");
+            pointNumbers = Content.Load<SpriteFont>("pointNumbers");
+            followingFont = Content.Load<SpriteFont>("following");
 
         }
 
@@ -111,6 +141,11 @@ namespace ICS4U_Final_Project
             mouseCircle = new Circle(mousePos, 10);
             coinCircle = new Circle(coinSpawnCircle, 30);
 
+            seconds = (float)gameTime.TotalGameTime.TotalSeconds - startTime;
+
+            cursorRect.X = mouseState.X - 16;
+            cursorRect.Y = mouseState.Y - 16;
+
             if (screen == Screen.Intro)
             {
 
@@ -119,7 +154,7 @@ namespace ICS4U_Final_Project
             if (screen == Screen.Game)
             {
                 // - checking if mouse is in screen when target is attempted to be created
-                if (mousePos.X > 0 && mousePos.X < 1080 && mousePos.Y > 0 && mousePos.Y < 720)
+                if (mousePos.X > 0 && mousePos.X < 1080 && mousePos.Y > 0 && mousePos.Y < 720 && menuOpenBool == false)
                 { // - making a target on mouse click
                     if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released)
                     {
@@ -127,7 +162,7 @@ namespace ICS4U_Final_Project
                         targetCircle = new Circle(target, 5);
                         targetBool = true;
                         angle = GetAngle(planeLocation, new Vector2(target.X, target.Y));
-                        targetRect = new Rectangle((int)target.X - 25, (int)target.Y - 45, 50, 50);
+                        targetRect = new Rectangle((int)target.X - 16, (int)target.Y - 30, 32, 32);
                     }
                 }
 
@@ -149,10 +184,24 @@ namespace ICS4U_Final_Project
                 
                 // - boost
                 if (keyboardState.IsKeyDown(Keys.Space))
-                    planeLocation += direction * 2;
-
+                {
+                    if (boostAmount > 0)
+                        planeLocation += direction * 2;
+                    else
+                        planeLocation += direction;
+                    boostAmount -= 1;
+                    if (boostAmount < 0)
+                    {
+                        boostAmount = 0;
+                    }
+                }
                 else
+                {
                     planeLocation += direction;
+                    boostAmount += 1;
+                    if (boostAmount > totalBoost)
+                        boostAmount = totalBoost;
+                }
 
                 // - once plane reaches cursor, rotation and movement stops
                 if (mouseCircle.Contains(planeLocation))
@@ -166,14 +215,31 @@ namespace ICS4U_Final_Project
                     if (targetCircle.Contains(planeLocation))
                         targetBool = false;
 
-                // previous action things
+                // - upgrade menu
+                if (keyboardState.IsKeyDown(Keys.Tab))
+                {
+                    menuOpenBool = true;
+                    angle = prevAngle;
+                    planeLocation = prevPlaneLocation;
+                    boostAmount = prevBoostAmount;
+
+
+                }
+
+                if (keyboardState.IsKeyUp(Keys.Tab))
+                    menuOpenBool = false;
+
+                // - previous action things
                 prevPlaneLocation = planeLocation;
                 prevAngle = angle;
                 prevMouseState = mouseState;
+                prevBoostAmount = boostAmount;
 
-                // coins
+                // - coins and coin points
                 if (coinCircle.Contains(planeLocation))
                 {
+                    coinPoints = new Vector2(coinSpawnX - 40, coinSpawnY - 20);
+
                     coinSpawnX = generator.Next(60, 1020);
                     coinSpawnY = generator.Next(60, 660);
 
@@ -181,7 +247,13 @@ namespace ICS4U_Final_Project
 
                     points += 100;
                     totalPoints += 100;
+                    startTime = (float)gameTime.TotalGameTime.TotalSeconds;
+                    coinPointsBool = true;
                 }
+
+                // - plane shadow
+                planeShadowLocation = new Vector2(planeLocation.X - 30, planeLocation.Y + 75);
+
             }
 
             if (screen == Screen.Outro)
@@ -205,14 +277,45 @@ namespace ICS4U_Final_Project
 
             if (screen == Screen.Game)
             {
+                // - coins
                 _spriteBatch.Draw(coinTexture, coinRect, Color.White);
 
+                // - pin
                 if (targetBool == true)
                     _spriteBatch.Draw(targetTexture, targetRect, Color.White);
 
+                // - plane shadow
+                _spriteBatch.Draw(planeTexture, planeShadowLocation, null, Color.Black * 0.4f, angle, origin, 1f, SpriteEffects.None, 0f);
+
+                // - plane
                 _spriteBatch.Draw(planeTexture, planeLocation, null, Color.White, angle, origin, 1f, SpriteEffects.None, 0f);
 
+                // - hud points
                 _spriteBatch.DrawString(pointsFont, $"Points :  {points}", new Vector2(40, 60), Color.Black);
+
+                // - points numbers
+                if (seconds < 3 && coinPointsBool == true)
+                    _spriteBatch.DrawString(pointNumbers, "+100", coinPoints, Color.White);
+
+                // - cursor
+                _spriteBatch.Draw(cursorTexture, cursorRect, Color.White);
+
+                // - boost amount
+                _spriteBatch.DrawString(pointsFont, boostAmount.ToString(), new Vector2(40, 100), Color.White);
+
+                // - plane target
+                if (targetBool == true)
+                    _spriteBatch.DrawString(followingFont, "Following: Pin", new Vector2(40, 150), Color.White);
+                else
+                    _spriteBatch.DrawString(followingFont, "Following: Cursor", new Vector2(40, 150), Color.White);
+
+
+
+                // where i left off vvvvvvvvvvvvvvvvv 
+                if (menuOpenBool == true)
+                {
+                    _spriteBatch.Draw(plusButtonTexture, plusButtonRect, Color.White);
+                }
             }
 
             if (screen == Screen.Outro)
