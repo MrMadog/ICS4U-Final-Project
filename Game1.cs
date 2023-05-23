@@ -247,6 +247,7 @@ namespace ICS4U_Final_Project
                     if (button.IsPressed(mouse))
                         totalBoost += 100;
 
+
                     button.Update();
 
                     /*
