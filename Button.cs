@@ -35,9 +35,11 @@ namespace ICS4U_Final_Project
             return (_rectangle.Contains(point));
         }
 
-        public bool IsPressed(Point point)
+        public bool IsPressed()
         {
-            return _rectangle.Contains(point) || mouseState.LeftButton == ButtonState.Pressed || prevMouseState.LeftButton == ButtonState.Released;
+            if (_rectangle.Contains(mouse))
+                return (mouseState.LeftButton == ButtonState.Pressed);
+            else return false;
         }
 
         public void Update()
@@ -50,6 +52,8 @@ namespace ICS4U_Final_Project
             if (_rectangle.Contains(mouse))
                 if (mouseState.LeftButton == ButtonState.Pressed)
                     _drawTexture = _texture2;
+
+            prevMouseState = mouseState;
         }
 
         public void Draw(SpriteBatch _spriteBatch)

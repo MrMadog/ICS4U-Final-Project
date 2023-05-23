@@ -162,6 +162,8 @@ namespace ICS4U_Final_Project
             plusButton2 = plusButtonTexture;
             minusButton2 = minusButtonTexture;
 
+            button.Update();
+
             buttonHover = false;
 
             if (screen == Screen.Intro)
@@ -244,11 +246,8 @@ namespace ICS4U_Final_Project
                     if (button.IsHovering(mouse))
                         buttonHover = true;
 
-                    if (button.IsPressed(mouse))
+                    if (button.IsPressed())
                         totalBoost += 100;
-
-
-                    button.Update();
 
                     /*
                     if (minusButtonRect.Contains(mouse) || plusButtonRect.Contains(mouse) || minusButtonRect1.Contains(mouse) || plusButtonRect1.Contains(mouse) || minusButtonRect2.Contains(mouse) || plusButtonRect2.Contains(mouse))
