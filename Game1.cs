@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Collections.Generic;
 
 namespace ICS4U_Final_Project
 {
@@ -27,6 +28,8 @@ namespace ICS4U_Final_Project
 
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
+
+        List<Button> buttons;
 
         Texture2D planeTexture, targetTexture, coinTexture, cursorTexture;
         Texture2D plusButtonTexture, plusButtonTextureP, minusButtonTexture, minusButtonTextureP;
@@ -64,7 +67,7 @@ namespace ICS4U_Final_Project
 
         SpriteFont pointsFont, pointNumbers, followingFont, upgradeMenuFont;
 
-        Button button;
+        //Button button;
 
         public Game1()
         {
@@ -82,6 +85,8 @@ namespace ICS4U_Final_Project
             screen = Screen.Intro;
 
             Mouse.SetPosition(540, 360);
+
+            buttons = new List<Button>();
 
             planeLocation = new Vector2(540, 800);
 
@@ -104,9 +109,13 @@ namespace ICS4U_Final_Project
 
             dimScreenRect = new Rectangle(0, 0, 1080, 720);
 
+
             base.Initialize();
 
-            button = new Button(plusButtonTexture, plusButtonTextureP, plusButtonRect);
+            //button = new Button(plusButtonTexture, plusButtonTextureP, plusButtonRect);
+
+            buttons.Add(new Button(plusButtonTexture, plusButtonTextureP, new Rectangle(700, 300, 36, 36)));
+
         }
 
         protected override void LoadContent()
@@ -134,6 +143,7 @@ namespace ICS4U_Final_Project
 
         protected override void Update(GameTime gameTime)
         {
+            prevMouseState = mouseState;
             mouseState = Mouse.GetState();
             keyboardState = Keyboard.GetState();
 
@@ -162,7 +172,7 @@ namespace ICS4U_Final_Project
             plusButton2 = plusButtonTexture;
             minusButton2 = minusButtonTexture;
 
-            button.Update();
+            buttons[0].Update();
 
             buttonHover = false;
 
@@ -243,21 +253,21 @@ namespace ICS4U_Final_Project
                     planeLocation = prevPlaneLocation;
                     boostAmount = prevBoostAmount;
 
-                    if (button.IsHovering(mouse))
+                    if (buttons[0].IsHovering(mouse))
                         buttonHover = true;
 
-                    if (button.IsPressed())
+                    if (buttons[0].IsPressed())
                         totalBoost += 100;
 
                     /*
                     if (minusButtonRect.Contains(mouse) || plusButtonRect.Contains(mouse) || minusButtonRect1.Contains(mouse) || plusButtonRect1.Contains(mouse) || minusButtonRect2.Contains(mouse) || plusButtonRect2.Contains(mouse))
                     {
-                        //buttonHover = true;
+                        buttonHover = true;
 
                         if (plusButtonRect.Contains(mouse))
                             if (mouseState.LeftButton == ButtonState.Pressed)
                             {
-                               // plusButton = plusButtonTextureP;
+                                plusButton = plusButtonTextureP;
                                 if (points >= 100)
                                     points -= 100;
                             }                                
@@ -376,12 +386,12 @@ namespace ICS4U_Final_Project
                 {
                     _spriteBatch.Draw(dimScreen, dimScreenRect, Color.Black * 0.3f);
 
-                    button.Draw(_spriteBatch);
+                    buttons[0].Draw(_spriteBatch);
 
 
 
                     // - row 1
-                   // _spriteBatch.Draw(plusButton, plusButtonRect, Color.White);
+                    //_spriteBatch.Draw(plusButton, plusButtonRect, Color.White);
                    // _spriteBatch.Draw(minusButton, minusButtonRect, Color.White);
                    // _spriteBatch.DrawString(upgradeMenuFont, "Health   ...................................", new Vector2(300, 310), Color.White);
 
@@ -400,6 +410,11 @@ namespace ICS4U_Final_Project
                 _spriteBatch.Draw(cursorTexture, cursorRect, Color.White);
                 if (buttonHover == true)
                     _spriteBatch.Draw(cursorTexture, cursorRect, Color.Black);
+
+                if (buttons[0].IsPressed())
+                {
+                    _spriteBatch.DrawString(upgradeMenuFont, "Pressing", new Vector2(800, 200), Color.Black);
+                }
             }
 
             if (screen == Screen.Outro)
