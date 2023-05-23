@@ -19,7 +19,6 @@ namespace ICS4U_Final_Project
             else
 
                 return (float)(Math.PI + Math.Atan(rise / run));
-
         }
 
 
@@ -65,6 +64,8 @@ namespace ICS4U_Final_Project
 
         SpriteFont pointsFont, pointNumbers, followingFont, upgradeMenuFont;
 
+        Button button;
+
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -104,6 +105,8 @@ namespace ICS4U_Final_Project
             dimScreenRect = new Rectangle(0, 0, 1080, 720);
 
             base.Initialize();
+
+            button = new Button(plusButtonTexture, plusButtonTextureP, plusButtonRect);
         }
 
         protected override void LoadContent()
@@ -238,14 +241,23 @@ namespace ICS4U_Final_Project
                     planeLocation = prevPlaneLocation;
                     boostAmount = prevBoostAmount;
 
+                    if (button.IsHovering(mouse))
+                        buttonHover = true;
+
+                    if (button.IsPressed(mouse))
+                        totalBoost += 100;
+
+                    button.Update();
+
+                    /*
                     if (minusButtonRect.Contains(mouse) || plusButtonRect.Contains(mouse) || minusButtonRect1.Contains(mouse) || plusButtonRect1.Contains(mouse) || minusButtonRect2.Contains(mouse) || plusButtonRect2.Contains(mouse))
                     {
-                        buttonHover = true;
+                        //buttonHover = true;
 
                         if (plusButtonRect.Contains(mouse))
                             if (mouseState.LeftButton == ButtonState.Pressed)
                             {
-                                plusButton = plusButtonTextureP;
+                               // plusButton = plusButtonTextureP;
                                 if (points >= 100)
                                     points -= 100;
                             }                                
@@ -274,7 +286,7 @@ namespace ICS4U_Final_Project
                         if (minusButtonRect2.Contains(mouse))
                             if (mouseState.LeftButton == ButtonState.Pressed)
                                 minusButton2 = minusButtonTextureP;
-                    }
+                    }*/
 
                 }
 
@@ -364,10 +376,14 @@ namespace ICS4U_Final_Project
                 {
                     _spriteBatch.Draw(dimScreen, dimScreenRect, Color.Black * 0.3f);
 
+                    button.Draw(_spriteBatch);
+
+
+
                     // - row 1
-                    _spriteBatch.Draw(plusButton, plusButtonRect, Color.White);
-                    _spriteBatch.Draw(minusButton, minusButtonRect, Color.White);
-                    _spriteBatch.DrawString(upgradeMenuFont, "Health   ...................................", new Vector2(300, 310), Color.White);
+                   // _spriteBatch.Draw(plusButton, plusButtonRect, Color.White);
+                   // _spriteBatch.Draw(minusButton, minusButtonRect, Color.White);
+                   // _spriteBatch.DrawString(upgradeMenuFont, "Health   ...................................", new Vector2(300, 310), Color.White);
 
                     // - row 2
                     _spriteBatch.Draw(plusButton1, plusButtonRect1, Color.White);
