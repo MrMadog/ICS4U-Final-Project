@@ -28,7 +28,8 @@
 
 	Menu Screen: 
 		- start button, quit game button, keybinds settings, choose plane button
-		- ability to change keybinds
+		- ability to change keybinds(maybe)
+		- ability to change sound levels(maybe)
 		- maybe a how-to-play button that shows keybinds
 
 	Upgrade Menu:
@@ -36,4 +37,13 @@
 		- Ammo(bullets, maybe max capacity)
 		- Health
 		- Bombs
-		- 
+		- hover over for info on what each does
+		- if not enough points, give them a warning about not enough points
+
+
+	Things to do:
+		- Enemies
+		- Bombs
+		- Ammo
+		- Intro and outro screens
+		- Improve UI and add onto button class(sounds)
