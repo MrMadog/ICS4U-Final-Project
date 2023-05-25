@@ -32,15 +32,13 @@ namespace ICS4U_Final_Project
         List<Button> buttons;
 
         Texture2D planeTexture, targetTexture, coinTexture, cursorTexture;
-        Texture2D plusButtonTexture, plusButtonTextureP, minusButtonTexture, minusButtonTextureP;
-        Texture2D plusButton, minusButton, plusButton1, minusButton1, plusButton2, minusButton2, dimScreen;
+        Texture2D plusButtonTexture, plusButtonTextureP, minusButtonTexture, minusButtonTextureP, dimScreen;
 
-        Rectangle targetRect, coinRect, cursorRect;
-        Rectangle plusButtonRect, minusButtonRect, plusButtonRect1, minusButtonRect1, plusButtonRect2, minusButtonRect2;
-        Rectangle dimScreenRect;
+        Rectangle targetRect, coinRect, cursorRect, cursorHoverRect;
+        Rectangle dimScreenRect, upgradeMenuRect, upgradeMenuInfoRect, upgradeMenuPointsRect;
 
         MouseState mouseState, prevMouseState;
-        KeyboardState keyboardState;
+        KeyboardState keyboardState, prevKeyboardState;
 
         float angle, prevAngle, seconds, startTime;
 
@@ -52,7 +50,7 @@ namespace ICS4U_Final_Project
         }
 
         int coinSpawnX, coinSpawnY, points, totalPoints;
-        int boostAmount, prevBoostAmount, totalBoost;
+        int boostAmount, prevBoostAmount, totalBoost, planeHealth, totalPlaneHealth, planeAmmo;
 
         Screen screen;
 
@@ -60,14 +58,16 @@ namespace ICS4U_Final_Project
 
         Circle mouseCircle, targetCircle, coinCircle;
 
+        Color colour;
+
         bool targetBool = false;
         bool coinPointsBool = false;
         bool menuOpenBool = false;
         bool buttonHover = false;
+        bool done = false;
+        bool fadeBool = false;
 
-        SpriteFont pointsFont, pointNumbers, followingFont, upgradeMenuFont;
-
-        //Button button;
+        SpriteFont pointsFont, pointNumbers, followingFont, upgradeMenuFont, upgradeMenuInfoFont, currentFont, availablePointsFont;
 
         public Game1()
         {
@@ -84,8 +84,6 @@ namespace ICS4U_Final_Project
 
             screen = Screen.Intro;
 
-            Mouse.SetPosition(540, 360);
-
             buttons = new List<Button>();
 
             planeLocation = new Vector2(540, 800);
@@ -96,25 +94,34 @@ namespace ICS4U_Final_Project
             coinRect = new Rectangle(coinSpawnX, coinSpawnY, 30, 30);
 
             cursorRect = new Rectangle(0, 0, 32, 32);
+            cursorHoverRect = new Rectangle(0, 0, 28, 28);
 
             boostAmount = 200;
             totalBoost = boostAmount;
 
-            plusButtonRect = new Rectangle(700, 300, 36, 36);
-            minusButtonRect = new Rectangle(650, 300, 36, 36);
-            plusButtonRect1 = new Rectangle(700, 380, 36, 36);
-            minusButtonRect1 = new Rectangle(650, 380, 36, 36);
-            plusButtonRect2 = new Rectangle(700, 460, 36, 36);
-            minusButtonRect2 = new Rectangle(650, 460, 36, 36);
+            planeHealth = 100;
+            totalPlaneHealth = planeHealth;
 
             dimScreenRect = new Rectangle(0, 0, 1080, 720);
+            upgradeMenuRect = new Rectangle(90, 200, 580, 350);
+            upgradeMenuInfoRect = new Rectangle(690, 200, 300, 500);
+            upgradeMenuPointsRect = new Rectangle(90, 570, 580, 130);
 
+            colour = new Color(0, 0, 0, 0);
 
             base.Initialize();
 
-            //button = new Button(plusButtonTexture, plusButtonTextureP, plusButtonRect);
 
-            buttons.Add(new Button(plusButtonTexture, plusButtonTextureP, new Rectangle(700, 300, 36, 36)));
+            // - minus buttons
+            buttons.Add(new Button(minusButtonTexture, minusButtonTextureP, new Rectangle(540, 240, 36, 36))); // 0
+            buttons.Add(new Button(minusButtonTexture, minusButtonTextureP, new Rectangle(540, 320, 36, 36))); // 1
+            buttons.Add(new Button(minusButtonTexture, minusButtonTextureP, new Rectangle(540, 400, 36, 36))); // 2
+            buttons.Add(new Button(minusButtonTexture, minusButtonTextureP, new Rectangle(540, 480, 36, 36))); // 3
+            // - plus buttons
+            buttons.Add(new Button(plusButtonTexture, plusButtonTextureP, new Rectangle(590, 240, 36, 36))); // 4
+            buttons.Add(new Button(plusButtonTexture, plusButtonTextureP, new Rectangle(590, 320, 36, 36))); // 5
+            buttons.Add(new Button(plusButtonTexture, plusButtonTextureP, new Rectangle(590, 400, 36, 36))); // 6
+            buttons.Add(new Button(plusButtonTexture, plusButtonTextureP, new Rectangle(590, 480, 36, 36))); // 7
 
         }
 
@@ -138,12 +145,16 @@ namespace ICS4U_Final_Project
             pointNumbers = Content.Load<SpriteFont>("pointNumbers");
             followingFont = Content.Load<SpriteFont>("following");
             upgradeMenuFont = Content.Load<SpriteFont>("upgrade menu");
+            upgradeMenuInfoFont = Content.Load<SpriteFont>("upgrade_menu_info");
+            currentFont = Content.Load<SpriteFont>("Current Font");
+            availablePointsFont = Content.Load<SpriteFont>("Available Points");
 
         }
 
         protected override void Update(GameTime gameTime)
         {
             prevMouseState = mouseState;
+            prevKeyboardState = keyboardState;
             mouseState = Mouse.GetState();
             keyboardState = Keyboard.GetState();
 
@@ -152,8 +163,6 @@ namespace ICS4U_Final_Project
 
             mouse = new Point(mouseState.X, mouseState.Y);
             mousePos = new Vector2(mouseState.X, mouseState.Y);
-
-            screen = Screen.Game;
 
             coinSpawnCircle = new Vector2(coinSpawnX + coinRect.Width / 2, coinSpawnY + coinRect.Height / 2);
 
@@ -164,23 +173,34 @@ namespace ICS4U_Final_Project
 
             cursorRect.X = mouseState.X - 16;
             cursorRect.Y = mouseState.Y - 16;
+            cursorHoverRect.X = mouseState.X - 14;
+            cursorHoverRect.Y = mouseState.Y - 14;
 
-            plusButton = plusButtonTexture;
-            minusButton = minusButtonTexture;
-            plusButton1 = plusButtonTexture;
-            minusButton1 = minusButtonTexture;
-            plusButton2 = plusButtonTexture;
-            minusButton2 = minusButtonTexture;
-
-            buttons[0].Update();
+            for (int i = 0; i < 8; i++)
+                buttons[i].Update();
 
             buttonHover = false;
 
+            // - Intro --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
             if (screen == Screen.Intro)
             {
+                if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released)
+                {
+                    fadeBool = true;
+                }
+                if (fadeBool == true)
+                    colour.A += 5;
 
+                if (colour.A >= 255)
+                    done = true;
+
+                if (done == true)
+                {
+                    screen = Screen.Game;
+                }
             }
 
+            // - Game ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
             if (screen == Screen.Game)
             {
                 // - checking if mouse is in screen when target is attempted to be created
@@ -253,50 +273,66 @@ namespace ICS4U_Final_Project
                     planeLocation = prevPlaneLocation;
                     boostAmount = prevBoostAmount;
 
-                    if (buttons[0].IsHovering(mouse))
-                        buttonHover = true;
-
-                    if (buttons[0].IsPressed())
-                        totalBoost += 100;
-
-                    /*
-                    if (minusButtonRect.Contains(mouse) || plusButtonRect.Contains(mouse) || minusButtonRect1.Contains(mouse) || plusButtonRect1.Contains(mouse) || minusButtonRect2.Contains(mouse) || plusButtonRect2.Contains(mouse))
+                    for (int i = 0; i < 8; i++)
                     {
-                        buttonHover = true;
+                        if (buttons[i].IsHovering(mouse))
+                            buttonHover = true;
+                    }
 
-                        if (plusButtonRect.Contains(mouse))
-                            if (mouseState.LeftButton == ButtonState.Pressed)
-                            {
-                                plusButton = plusButtonTextureP;
-                                if (points >= 100)
-                                    points -= 100;
-                            }                                
-                        if (minusButtonRect.Contains(mouse))
-                            if (mouseState.LeftButton == ButtonState.Pressed)
-                                minusButton = minusButtonTextureP;
+                    // - row 1 (health cost 500 for +50, return for 400)
+                    if (buttons[4].IsPressed())
+                        if (points >= 500 && totalPlaneHealth < 500)
+                        {
+                            totalPlaneHealth += 50;
+                            if (planeHealth == totalPlaneHealth - 50)
+                                planeHealth = totalPlaneHealth;
+                            points -= 500;
+                        }
+                    if (buttons[0].IsPressed())
+                        if (totalPlaneHealth >= 150)
+                        {
+                            totalPlaneHealth -= 50;
+                            points += 400;
+                        }
+                    // - row 2 (boost cost 200 for +25, return for 100)
+                    if (buttons[5].IsPressed())
+                        if (points >= 200 && totalBoost < 1000)
+                        {
+                            totalBoost += 25;
+                            points -= 200;
+                        }
+                    if (buttons[1].IsPressed())
+                        if (totalBoost >= 225)
+                        {
+                            totalBoost -= 25;
+                            points += 100;
+                        }
+                    // - row 3 (ammo cost 200 for + 5, return for 50/bullet)
+                    if (buttons[6].IsPressed())
+                        if (planeAmmo < 40 && points >= 200)
+                        {
+                            planeAmmo += 5;
+                            points -= 200;
+                        }
+                    if (buttons[2].IsPressed())
+                        if (planeAmmo > 1)
+                        {
+                            planeAmmo -= 2;
+                            points += 50;
+                        }
+                    // - row 4
+                    if (buttons[7].IsPressed())
+                    {
 
-                        if (plusButtonRect1.Contains(mouse))
-                            if (mouseState.LeftButton == ButtonState.Pressed)
-                            {
-                                plusButton1 = plusButtonTextureP;
-                                if (points >= 100)
-                                {
-                                    points -= 100;
-                                    totalBoost += 100;
-                                }                                    
-                            }
+                    }
 
-                        if (minusButtonRect1.Contains(mouse))
-                            if (mouseState.LeftButton == ButtonState.Pressed)
-                                minusButton1 = minusButtonTextureP;
+                    if (buttons[3].IsPressed())
+                    {
 
-                        if (plusButtonRect2.Contains(mouse))
-                            if (mouseState.LeftButton == ButtonState.Pressed)
-                                plusButton2 = plusButtonTextureP;
-                        if (minusButtonRect2.Contains(mouse))
-                            if (mouseState.LeftButton == ButtonState.Pressed)
-                                minusButton2 = minusButtonTextureP;
-                    }*/
+                    }
+
+
+
 
                 }
 
@@ -328,8 +364,14 @@ namespace ICS4U_Final_Project
                 // - plane shadow
                 planeShadowLocation = new Vector2(planeLocation.X - 30, planeLocation.Y + 75);
 
+
+                if (keyboardState.IsKeyDown(Keys.RightControl) && prevKeyboardState.IsKeyUp(Keys.RightControl))
+                {
+                    screen = Screen.Outro;
+                }
             }
 
+            // - Outro --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
             if (screen == Screen.Outro)
             {
 
@@ -347,6 +389,14 @@ namespace ICS4U_Final_Project
             if (screen == Screen.Intro)
             {
 
+                // - cursor
+                if (buttonHover == true)
+                    _spriteBatch.Draw(cursorTexture, cursorHoverRect, Color.DarkGray);
+                else
+                    _spriteBatch.Draw(cursorTexture, cursorRect, Color.White);
+
+                // - screen fade
+                _spriteBatch.Draw(dimScreen, dimScreenRect, colour);
             }
 
             if (screen == Screen.Game)
@@ -365,14 +415,14 @@ namespace ICS4U_Final_Project
                 _spriteBatch.Draw(planeTexture, planeLocation, null, Color.White, angle, origin, 1f, SpriteEffects.None, 0f);
 
                 // - hud points
-                _spriteBatch.DrawString(pointsFont, $"Points :  {points}", new Vector2(40, 60), Color.Black);
+                _spriteBatch.DrawString(pointsFont, $"Points :  {points}", new Vector2(40, 40), Color.Black);
 
                 // - points numbers
                 if (seconds < 3 && coinPointsBool == true)
                     _spriteBatch.DrawString(pointNumbers, "+100", coinPoints, Color.White);
 
                 // - boost amount
-                _spriteBatch.DrawString(pointsFont, boostAmount.ToString(), new Vector2(40, 100), Color.White);
+                _spriteBatch.DrawString(followingFont, $"Boost: {boostAmount.ToString()}", new Vector2(40, 100), Color.White);
 
                 // - plane target
                 if (targetBool == true)
@@ -380,46 +430,80 @@ namespace ICS4U_Final_Project
                 else
                     _spriteBatch.DrawString(followingFont, "Following: Cursor", new Vector2(40, 150), Color.White);
 
+                // - plane health
+                _spriteBatch.DrawString(followingFont, $"Health: {planeHealth.ToString()}", new Vector2(40, 200), Color.White);
+
+                // - plane ammo
+                _spriteBatch.DrawString(followingFont, $"Ammo: {planeAmmo.ToString()}", new Vector2(40, 250), Color.White);
+
 
                 // - upgrade menu
                 if (menuOpenBool == true)
                 {
+                    // - dim areas
                     _spriteBatch.Draw(dimScreen, dimScreenRect, Color.Black * 0.3f);
-
-                    buttons[0].Draw(_spriteBatch);
-
-
-
-                    // - row 1
-                    //_spriteBatch.Draw(plusButton, plusButtonRect, Color.White);
-                   // _spriteBatch.Draw(minusButton, minusButtonRect, Color.White);
-                   // _spriteBatch.DrawString(upgradeMenuFont, "Health   ...................................", new Vector2(300, 310), Color.White);
-
-                    // - row 2
-                    _spriteBatch.Draw(plusButton1, plusButtonRect1, Color.White);
-                    _spriteBatch.Draw(minusButton1, minusButtonRect1, Color.White);
-                    _spriteBatch.DrawString(upgradeMenuFont, "Boost     ...................................", new Vector2(300, 390), Color.White);
-
-                    // - row 3
-                    _spriteBatch.Draw(plusButton2, plusButtonRect2, Color.White);
-                    _spriteBatch.Draw(minusButton2, minusButtonRect2, Color.White);
-                    _spriteBatch.DrawString(upgradeMenuFont, "Ammo       ...................................", new Vector2(300, 470), Color.White);
+                    _spriteBatch.Draw(dimScreen, upgradeMenuRect, Color.Black * 0.5f);
+                    _spriteBatch.Draw(dimScreen, upgradeMenuPointsRect, Color.Black * 0.5f);
+                    // buttons
+                    for (int i = 0; i < 8; i++)
+                        buttons[i].Draw(_spriteBatch);
+                    // lines
+                    _spriteBatch.DrawString(upgradeMenuFont, "Health   ..........................................", new Vector2(140, 250), Color.White);
+                    _spriteBatch.DrawString(upgradeMenuFont, "Boost     ..........................................", new Vector2(140, 330), Color.White);
+                    _spriteBatch.DrawString(upgradeMenuFont, "Ammo       ..........................................", new Vector2(140, 410), Color.White);
+                    _spriteBatch.DrawString(upgradeMenuFont, "Bombs    ..........................................", new Vector2(140, 490), Color.White);
+                    // available points
+                    _spriteBatch.DrawString(availablePointsFont, $"Available Points: {points}", new Vector2(110, 615), Color.White);
+                    // info areas
+                    if (buttons[0].IsHovering(mouse) || buttons[4].IsHovering(mouse))
+                    {
+                        _spriteBatch.Draw(dimScreen, upgradeMenuInfoRect, Color.Black * 0.8f);
+                        _spriteBatch.DrawString(followingFont, "Plane Health", new Vector2(700, 220), Color.White);
+                        _spriteBatch.DrawString(upgradeMenuInfoFont, "Clicking the ''+'' will give you +50\r\nmax health cap.\r\nCost: 500 Points\r\n\r\nClicking the ''-'' will take -50\r\nfrom your max health cap, and\r\ngive you some credits back.\r\nRefund: 400 Points ", new Vector2(700, 250), Color.White);
+                        _spriteBatch.DrawString(currentFont, "Current Max\r\nHealth:", new Vector2(700, 600), Color.White);
+                        _spriteBatch.DrawString(pointsFont, totalPlaneHealth.ToString(), new Vector2(700, 660), Color.White);
+                    }
+                    if (buttons[1].IsHovering(mouse) || buttons[5].IsHovering(mouse))
+                    {
+                        _spriteBatch.Draw(dimScreen, upgradeMenuInfoRect, Color.Black * 0.8f);
+                        _spriteBatch.DrawString(followingFont, "Boost", new Vector2(700, 220), Color.White);
+                        _spriteBatch.DrawString(upgradeMenuInfoFont, "Clicking the ''+'' will give you +25\r\nmax boost cap.\r\nCost: 200 Points\r\n\r\nClicking the ''-'' will take -25\r\nfrom your max boost cap, and \r\ngive you some credits back.\r\nRefund: 100 Points ", new Vector2(700, 250), Color.White);
+                        _spriteBatch.DrawString(currentFont, "Current Max\r\nBoost:", new Vector2(700, 600), Color.White);
+                        _spriteBatch.DrawString(pointsFont, totalBoost.ToString(), new Vector2(700, 660), Color.White);
+                    }
+                    if (buttons[2].IsHovering(mouse) || buttons[6].IsHovering(mouse))
+                    {
+                        _spriteBatch.Draw(dimScreen, upgradeMenuInfoRect, Color.Black * 0.8f);
+                        _spriteBatch.DrawString(followingFont, "Ammo", new Vector2(700, 220), Color.White);
+                        _spriteBatch.DrawString(upgradeMenuInfoFont, "Clicking the ''+'' will give you +5\r\nammo.\r\nCost: 200 Points\r\n\r\nClicking the ''-'' will take -1 ammo,\r\nand give you some credits back.\r\nRefund: 50 Points ", new Vector2(700, 250), Color.White);
+                        _spriteBatch.DrawString(currentFont, "Current Ammo:", new Vector2(700, 600), Color.White);
+                        _spriteBatch.DrawString(pointsFont, planeAmmo.ToString(), new Vector2(700, 660), Color.White);
+                    }
+                    if (buttons[3].IsHovering(mouse) || buttons[7].IsHovering(mouse))
+                    {
+                        _spriteBatch.Draw(dimScreen, upgradeMenuInfoRect, Color.Black * 0.8f);
+                        _spriteBatch.DrawString(followingFont, "Bombs", new Vector2(700, 220), Color.White);
+                        _spriteBatch.DrawString(upgradeMenuInfoFont, "Clicking the ''+'' will give you +25\r\nmax boost cap.\r\nCost: 200 Points\r\n\r\nClicking the ''-'' will take -25\r\nfrom your max boost cap, and \r\ngive you some credits back.\r\nRefund: 100 Points ", new Vector2(700, 250), Color.White);
+                    }
                 }
 
                 // - cursor
-                _spriteBatch.Draw(cursorTexture, cursorRect, Color.White);
                 if (buttonHover == true)
-                    _spriteBatch.Draw(cursorTexture, cursorRect, Color.Black);
+                    _spriteBatch.Draw(cursorTexture, cursorHoverRect, Color.DarkGray);
+                else
+                    _spriteBatch.Draw(cursorTexture, cursorRect, Color.White);
 
-                if (buttons[0].IsPressed())
-                {
-                    _spriteBatch.DrawString(upgradeMenuFont, "Pressing", new Vector2(800, 200), Color.Black);
-                }
             }
 
             if (screen == Screen.Outro)
             {
+                _spriteBatch.DrawString(followingFont, $"You got {totalPoints} points!", new Vector2(300, 400), Color.Black);
 
+                // - cursor
+                if (buttonHover == true)
+                    _spriteBatch.Draw(cursorTexture, cursorHoverRect, Color.DarkGray);
+                else
+                    _spriteBatch.Draw(cursorTexture, cursorRect, Color.White);
             }
             _spriteBatch.End();
 

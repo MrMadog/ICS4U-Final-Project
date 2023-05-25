@@ -52,7 +52,6 @@ namespace ICS4U_Final_Project
             if (_rectangle.Contains(mouse))
                 if (mouseState.LeftButton == ButtonState.Pressed)
                     _drawTexture = _texture2;
-
         }
 
         public void Draw(SpriteBatch _spriteBatch)

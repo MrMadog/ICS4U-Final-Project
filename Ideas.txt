@@ -36,4 +36,13 @@
 		- Ammo(bullets, maybe max capacity)
 		- Health
 		- Bombs
-		- 
+		- hover over for info on what each does
+		- if not enough points, give them a warning about not enough points
+
+
+	Things to do:
+		- Enemies
+		- Bombs
+		- Ammo
+		- Intro and outro screens
+		- Improve UI and add onto button class(sounds)
