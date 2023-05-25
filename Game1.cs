@@ -505,9 +505,7 @@ namespace ICS4U_Final_Project
 
                 // - bullets
                 if (bulletBool == true)
-                {
                     _spriteBatch.Draw(bulletTexture, bulletRect, null, Color.White, bulletRotation, null, SpriteEffects.None, 0f);
-                }
 
                 // - cursor
                 if (buttonHover == true)
