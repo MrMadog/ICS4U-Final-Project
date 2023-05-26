@@ -1,62 +1,46 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using System;
-using System.Reflection.Metadata;
-
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace ICS4U_Final_Project
 {
     internal class Bullet
     {
-        MouseState mouseState;
-
         private Texture2D _texture;
-        private float rotation;
+        private Vector2 _rotation;
+        private Rectangle _rectangle;
+        private Vector2 _location;
         private Vector2 _target;
-        private Vector2 _position;
-        private Vector2 _origin;
-        private Rectangle rectangle;
-        private Vector2 direction;
+        private Vector2 _velocity;
 
-        public float GetAngle(Vector2 originPoint, Vector2 secondPoint)
-        {
-            float rise = secondPoint.Y - originPoint.Y;
-
-            float run = secondPoint.X - originPoint.X;
-
-            if (originPoint.X <= secondPoint.X && originPoint.Y <= secondPoint.Y || originPoint.X <= secondPoint.X && originPoint.Y >= secondPoint.Y)
-                return (float)Math.Atan(rise / run);
-            else
-                return (float)(Math.PI + Math.Atan(rise / run));
-        }
-
-        public Bullet(Texture2D texture, Vector2 origin, Vector2 position, Vector2 target)
+        public Bullet(Texture2D texture, Vector2 location, Vector2 target)
         {
             _texture = texture;
-            _origin = origin;
+            _location = location;
             _target = target;
-            _position = position;
 
-            direction = _target - _origin;
-            rectangle = new Rectangle((int)origin.X, (int)origin.Y, 16, 16);
+            _rectangle = new Rectangle((int)_location.X, (int)_location.Y, 16, 16);
+
+            _velocity = new Vector2((_target.X - _location.X) / Vector2.Distance(_location, _target), (_target.Y - _location.Y) / Vector2.Distance(_location, _target));
         }
 
         public void Update()
         {
-            rotation = GetAngle(_origin, new Vector2(_target.X, _target.Y));
+            _location.X += _velocity.X;
+            _location.Y += _velocity.Y;
 
-            _position += direction;
+            _rectangle.X = (int)Math.Round(_location.X);
+            _rectangle.Y = (int)Math.Round(_location.Y); 
 
-
-
-            rectangle.X = (int)_position.X;
-            rectangle.Y = (int)_position.Y;
         }
 
         public void Draw(SpriteBatch _spriteBatch)
         {
-            _spriteBatch.Draw(_texture, rectangle, null, Color.White, rotation, new Vector2(_texture.Width/2, _texture.Height/2), SpriteEffects.None, 0f);
+            _spriteBatch.Draw(_texture, _rectangle, Color.White);
         }
     }
 }

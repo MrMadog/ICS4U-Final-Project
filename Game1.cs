@@ -31,7 +31,7 @@ namespace ICS4U_Final_Project
 
         List<Button> buttons;
 
-        Texture2D planeTexture, targetTexture, coinTexture, cursorTexture;
+        Texture2D planeTexture, targetTexture, coinTexture, cursorTexture, bulletTexture;
         Texture2D plusButtonTexture, plusButtonTextureP, minusButtonTexture, minusButtonTextureP, dimScreen;
 
         Rectangle targetRect, coinRect, cursorRect, cursorHoverRect;
@@ -366,14 +366,20 @@ namespace ICS4U_Final_Project
                 planeShadowLocation = new Vector2(planeLocation.X - 30, planeLocation.Y + 75);
 
                 // - bullets
-                if (mouseState.LeftButton == ButtonState.Pressed)
+                
+                if(bulletBool)
                 {
-                    
-                    bulletBool = true;
-                    planeBullet = new Bullet(bulletTexture, new Vector2(planeLocation.X, planeLocation.Y), planeLocation, new Vector2(mouseState.X, mouseState.Y));
-
+                    planeBullet.Update();
                 }
 
+                if (mouseState.LeftButton == ButtonState.Pressed)
+                {
+
+                    bulletBool = true;
+                    planeBullet = new Bullet(bulletTexture, planeLocation, mouseState.Position.ToVector2());
+
+                }
+                
 
                 if (keyboardState.IsKeyDown(Keys.RightControl) && prevKeyboardState.IsKeyUp(Keys.RightControl))
                 {
@@ -398,15 +404,8 @@ namespace ICS4U_Final_Project
 
             if (screen == Screen.Intro)
             {
-
-                // - cursor
-                if (buttonHover == true)
-                    _spriteBatch.Draw(cursorTexture, cursorHoverRect, Color.DarkGray);
-                else
-                    _spriteBatch.Draw(cursorTexture, cursorRect, Color.White);
-
-                // - screen fade
-                _spriteBatch.Draw(dimScreen, dimScreenRect, colour);
+                IntroScreen(gameTime);
+                
             }
 
             if (screen == Screen.Game)
@@ -498,7 +497,7 @@ namespace ICS4U_Final_Project
                 }
 
                 // - bullets
-                if (bulletBool == true)
+                if (bulletBool)
                     planeBullet.Draw(_spriteBatch);
 
 
@@ -523,6 +522,18 @@ namespace ICS4U_Final_Project
             _spriteBatch.End();
 
             base.Draw(gameTime);
+        }
+
+        public void IntroScreen(GameTime gameTime)
+        {
+            // - cursor
+            if (buttonHover == true)
+                _spriteBatch.Draw(cursorTexture, cursorHoverRect, Color.DarkGray);
+            else
+                _spriteBatch.Draw(cursorTexture, cursorRect, Color.White);
+
+            // - screen fade
+            _spriteBatch.Draw(dimScreen, dimScreenRect, colour);
         }
     }
 }
