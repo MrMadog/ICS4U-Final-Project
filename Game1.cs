@@ -31,16 +31,16 @@ namespace ICS4U_Final_Project
 
         List<Button> buttons;
 
-        Texture2D planeTexture, targetTexture, coinTexture, cursorTexture, bulletTexture;
+        Texture2D planeTexture, targetTexture, coinTexture, cursorTexture;
         Texture2D plusButtonTexture, plusButtonTextureP, minusButtonTexture, minusButtonTextureP, dimScreen;
 
-        Rectangle targetRect, coinRect, cursorRect, cursorHoverRect, bulletRect;
+        Rectangle targetRect, coinRect, cursorRect, cursorHoverRect;
         Rectangle dimScreenRect, upgradeMenuRect, upgradeMenuInfoRect, upgradeMenuPointsRect;
 
         MouseState mouseState, prevMouseState;
         KeyboardState keyboardState, prevKeyboardState;
 
-        float angle, prevAngle, seconds, startTime, bulletRotation;
+        float angle, prevAngle, seconds, startTime;
 
         Point mouse;
 
@@ -55,7 +55,6 @@ namespace ICS4U_Final_Project
         Screen screen;
 
         Vector2 origin, planeLocation, prevPlaneLocation, planeShadowLocation, mousePos, planeDirection, target, coinSpawnCircle, coinPoints;
-        Vector2 bulletVelocity, bulletPosition;
 
         Circle mouseCircle, targetCircle, coinCircle;
 
@@ -70,6 +69,8 @@ namespace ICS4U_Final_Project
         bool bulletBool = false;
 
         SpriteFont pointsFont, pointNumbers, followingFont, upgradeMenuFont, upgradeMenuInfoFont, currentFont, availablePointsFont;
+
+        Bullet planeBullet;
 
         public Game1()
         {
@@ -112,7 +113,6 @@ namespace ICS4U_Final_Project
             colour = new Color(0, 0, 0, 0);
 
             base.Initialize();
-
 
             // - minus buttons
             buttons.Add(new Button(minusButtonTexture, minusButtonTextureP, new Rectangle(540, 240, 36, 36))); // 0
@@ -230,7 +230,7 @@ namespace ICS4U_Final_Project
                     angle = GetAngle(planeLocation, new Vector2(mouseState.X, mouseState.Y));
                 }
 
-                // - rotation, direction and movement of plane
+                // - rotation and direction of plane
                 planeDirection = target - planeLocation;
                 planeDirection.Normalize();
                 origin = new Vector2(planeTexture.Width / 2, planeTexture.Height / 2);
@@ -366,18 +366,12 @@ namespace ICS4U_Final_Project
                 planeShadowLocation = new Vector2(planeLocation.X - 30, planeLocation.Y + 75);
 
                 // - bullets
-                if (keyboardState.IsKeyDown(Keys.M) && prevKeyboardState.IsKeyUp(Keys.M))
+                if (mouseState.LeftButton == ButtonState.Pressed)
                 {
+                    
                     bulletBool = true;
+                    planeBullet = new Bullet(bulletTexture, new Vector2(planeLocation.X, planeLocation.Y), planeLocation, new Vector2(mouseState.X, mouseState.Y));
 
-                    bulletRotation = GetAngle(planeLocation, new Vector2(mouseState.X, mouseState.Y));
-
-                    bulletVelocity = new Vector2((float)Math.Cos(bulletRotation), (float)Math.Sin(bulletRotation)) * 5f;
-                    bulletVelocity *= 2;
-
-                    bulletPosition += bulletVelocity;
-                    bulletRect.X = (int)bulletPosition.X;
-                    bulletRect.Y = (int)bulletPosition.Y;
                 }
 
 
@@ -505,7 +499,9 @@ namespace ICS4U_Final_Project
 
                 // - bullets
                 if (bulletBool == true)
-                    _spriteBatch.Draw(bulletTexture, bulletRect, null, Color.White, bulletRotation, Vector2.Zero, SpriteEffects.None, 0f);
+                    planeBullet.Draw(_spriteBatch);
+
+
 
                 // - cursor
                 if (buttonHover == true)
