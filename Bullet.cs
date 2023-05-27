@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -20,13 +21,16 @@ namespace ICS4U_Final_Project
         private Vector2 _target;
         private Vector2 _velocity;
         private Vector2 _rotationOrigin;
+        private SoundEffect _soundEffect;
+        private SoundEffectInstance _soundEffectInstance;
 
-        public Bullet(Texture2D texture, Vector2 location, Vector2 target, int speed)
+        public Bullet(Texture2D texture, Vector2 location, Vector2 target, int speed, SoundEffect soundEffect)
         {
             _texture = texture;
             _location = location;
             _target = target;
             _speed = speed;
+            _soundEffect = soundEffect;
 
             _rectangle = new Rectangle((int)_location.X, (int)_location.Y, 16, 16);
 
@@ -35,6 +39,10 @@ namespace ICS4U_Final_Project
             _rotation = GetAngle(_location, _target);
 
             _rotationOrigin = new Vector2(_texture.Width / 2, _texture.Height / 2);
+
+            _soundEffectInstance = _soundEffect.CreateInstance();
+
+            _soundEffectInstance.Play();
         }
 
         public float GetAngle(Vector2 originPoint, Vector2 secondPoint)
@@ -45,6 +53,11 @@ namespace ICS4U_Final_Project
                 return (float)Math.Atan(rise / run);
             else
                 return (float)(Math.PI + Math.Atan(rise / run));
+        }
+
+        public Vector2 BulletLocation
+        {
+            get { return _location; }
         }
 
         public void Update()

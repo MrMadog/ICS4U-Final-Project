@@ -15,6 +15,8 @@
 		- maybe have ammo that you can pick up and use
 		- possible button class (making it easier to draw and way less code)
 			- if button.Pressed()
+		- have player be able to pick plane and colour of plane at menu
+		- enemies be a certain colour that cant be picked by player
 
 	Enemy Ideas:
 		- Planes flying across the screen randomly
@@ -49,4 +51,8 @@
 		- Intro and outro screens
 		- Improve UI and add onto button class(sounds)
 		- Figure out binds for everything(pin, shoot, boost)
-		- pause bullets on menu open
+		- Pause bullets on menu open (done)
+		- Add sound effects for bullets
+
+
+	https://pixabay.com/sound-effects/search/gunshot/
