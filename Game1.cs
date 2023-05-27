@@ -11,18 +11,12 @@ namespace ICS4U_Final_Project
         public float GetAngle(Vector2 originPoint, Vector2 secondPoint)
         {
             float rise = secondPoint.Y - originPoint.Y;
-
             float run = secondPoint.X - originPoint.X;
-
             if (originPoint.X <= secondPoint.X && originPoint.Y <= secondPoint.Y || originPoint.X <= secondPoint.X && originPoint.Y >= secondPoint.Y)
-
                 return (float)Math.Atan(rise / run);
             else
-
                 return (float)(Math.PI + Math.Atan(rise / run));
         }
-
-
 
         Random generator = new Random();
 
@@ -30,7 +24,8 @@ namespace ICS4U_Final_Project
         private SpriteBatch _spriteBatch;
 
         List<Button> buttons;
-
+        List<Bullet> bullets;
+ 
         Texture2D planeTexture, targetTexture, coinTexture, cursorTexture, bulletTexture;
         Texture2D plusButtonTexture, plusButtonTextureP, minusButtonTexture, minusButtonTextureP, dimScreen;
 
@@ -88,6 +83,7 @@ namespace ICS4U_Final_Project
             screen = Screen.Intro;
 
             buttons = new List<Button>();
+            bullets = new List<Bullet>();
 
             planeLocation = new Vector2(540, 800);
 
@@ -141,7 +137,7 @@ namespace ICS4U_Final_Project
             plusButtonTextureP = Content.Load<Texture2D>("plusbuttonpressed");
             minusButtonTextureP = Content.Load<Texture2D>("minusbuttonpressed");
             dimScreen = Content.Load<Texture2D>("rectangle");
-            bulletTexture = Content.Load<Texture2D>("tile_0000");
+            bulletTexture = Content.Load<Texture2D>("planeBullet");
 
             // - fonts
             pointsFont = Content.Load<SpriteFont>("points");
@@ -366,20 +362,23 @@ namespace ICS4U_Final_Project
                 planeShadowLocation = new Vector2(planeLocation.X - 30, planeLocation.Y + 75);
 
                 // - bullets
-                
-                if(bulletBool)
+                if (keyboardState.IsKeyDown(Keys.RightAlt) && prevKeyboardState.IsKeyUp(Keys.RightAlt))
                 {
-                    planeBullet.Update();
+                    if (menuOpenBool == false)
+                    {
+                        bulletBool = true;
+                        if (planeAmmo > 0)
+                        {
+                            bullets.Add(new Bullet(bulletTexture, planeLocation, mouseState.Position.ToVector2(), 3));
+                            planeAmmo -= 1;
+                        }
+                    }
                 }
-
-                if (mouseState.LeftButton == ButtonState.Pressed)
+                if (bulletBool)
                 {
-
-                    bulletBool = true;
-                    planeBullet = new Bullet(bulletTexture, planeLocation, mouseState.Position.ToVector2());
-
+                    foreach (Bullet bullet in bullets)
+                        bullet.Update();
                 }
-                
 
                 if (keyboardState.IsKeyDown(Keys.RightControl) && prevKeyboardState.IsKeyUp(Keys.RightControl))
                 {
@@ -419,6 +418,12 @@ namespace ICS4U_Final_Project
 
                 // - plane shadow
                 _spriteBatch.Draw(planeTexture, planeShadowLocation, null, Color.Black * 0.4f, angle, origin, 1f, SpriteEffects.None, 0f);
+
+                // - bullets
+                foreach (Bullet bullet in bullets)
+                {
+                    bullet.Draw(_spriteBatch);
+                }              
 
                 // - plane
                 _spriteBatch.Draw(planeTexture, planeLocation, null, Color.White, angle, origin, 1f, SpriteEffects.None, 0f);
@@ -495,12 +500,6 @@ namespace ICS4U_Final_Project
                         _spriteBatch.DrawString(upgradeMenuInfoFont, "Clicking the ''+'' will give you +25\r\nmax boost cap.\r\nCost: 200 Points\r\n\r\nClicking the ''-'' will take -25\r\nfrom your max boost cap, and \r\ngive you some credits back.\r\nRefund: 100 Points ", new Vector2(700, 250), Color.White);
                     }
                 }
-
-                // - bullets
-                if (bulletBool)
-                    planeBullet.Draw(_spriteBatch);
-
-
 
                 // - cursor
                 if (buttonHover == true)

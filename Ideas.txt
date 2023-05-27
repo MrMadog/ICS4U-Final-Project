@@ -39,11 +39,13 @@
 		- Bombs
 		- hover over for info on what each does
 		- if not enough points, give them a warning about not enough points
+		- make into own screen
 
 
 	Things to do:
 		- Enemies
 		- Bombs
-		- Ammo
+		- Ammo (getting there)
 		- Intro and outro screens
 		- Improve UI and add onto button class(sounds)
+		- Figure out binds for everything(pin, shoot, boost)
