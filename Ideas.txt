@@ -49,3 +49,4 @@
 		- Intro and outro screens
 		- Improve UI and add onto button class(sounds)
 		- Figure out binds for everything(pin, shoot, boost)
+		- pause bullets on menu open

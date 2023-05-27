@@ -342,6 +342,7 @@ namespace ICS4U_Final_Project
                 prevMouseState = mouseState;
                 prevBoostAmount = boostAmount;
 
+
                 // - coins and coin points
                 if (coinCircle.Contains(planeLocation))
                 {
