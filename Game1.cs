@@ -26,8 +26,9 @@ namespace ICS4U_Final_Project
 
         List<Button> buttons;
         List<Bullet> bullets;
+        List<Trail> planeTrail;
  
-        Texture2D planeTexture, targetTexture, coinTexture, cursorTexture, bulletTexture;
+        Texture2D planeTexture, targetTexture, coinTexture, cursorTexture, bulletTexture, planeTrailTexture;
         Texture2D plusButtonTexture, plusButtonTextureP, minusButtonTexture, minusButtonTextureP, dimScreen;
 
         Rectangle targetRect, coinRect, cursorRect, cursorHoverRect;
@@ -63,7 +64,7 @@ namespace ICS4U_Final_Project
         bool fadeBool = false;
         bool bulletBool = false;
 
-        SpriteFont pointsFont, pointNumbers, followingFont, upgradeMenuFont, upgradeMenuInfoFont, currentFont, availablePointsFont;
+        SpriteFont pointsFont, pointNumbers, followingFont, upgradeMenuFont, upgradeMenuInfoFont, currentFont, availablePointsFont, menuTitleFont;
 
         SoundEffect planeShot;
 
@@ -84,6 +85,7 @@ namespace ICS4U_Final_Project
 
             buttons = new List<Button>();
             bullets = new List<Bullet>();
+            planeTrail = new List<Trail>();
 
             planeLocation = new Vector2(540, 800);
 
@@ -138,6 +140,7 @@ namespace ICS4U_Final_Project
             minusButtonTextureP = Content.Load<Texture2D>("minusbuttonpressed");
             dimScreen = Content.Load<Texture2D>("rectangle");
             bulletTexture = Content.Load<Texture2D>("planeBullet");
+            planeTrailTexture = Content.Load<Texture2D>("circle");
 
             // - fonts
             pointsFont = Content.Load<SpriteFont>("points");
@@ -147,6 +150,7 @@ namespace ICS4U_Final_Project
             upgradeMenuInfoFont = Content.Load<SpriteFont>("upgrade_menu_info");
             currentFont = Content.Load<SpriteFont>("Current Font");
             availablePointsFont = Content.Load<SpriteFont>("Available Points");
+            menuTitleFont = Content.Load<SpriteFont>("Menu Title Font");
 
             // - sounds
             planeShot = Content.Load<SoundEffect>("plane shot");
@@ -326,8 +330,19 @@ namespace ICS4U_Final_Project
                 coinPointsBool = true;
             }
 
-            // - plane shadow
+            // - plane shadow and trail
             planeShadowLocation = new Vector2(planeLocation.X - 30, planeLocation.Y + 75);
+
+            if (planeTrail.Count < 8) 
+                planeTrail.Add(new Trail(planeTrailTexture, planeLocation));
+            foreach (Trail PlaneTrail in planeTrail)
+            {
+                if (PlaneTrail.trailWidth >= 50)
+                {
+                    planeTrail.Remove(PlaneTrail);
+                    PlaneTrail.Update();
+                }
+            }
 
             // - bullets
             if (keyboardState.IsKeyDown(Keys.Space) && prevKeyboardState.IsKeyUp(Keys.Space))
@@ -344,6 +359,8 @@ namespace ICS4U_Final_Project
                 foreach (Bullet bullet in bullets)
                     bullet.Update();
             }
+
+
 
             if (keyboardState.IsKeyDown(Keys.RightControl) && prevKeyboardState.IsKeyUp(Keys.RightControl))
             {
@@ -420,6 +437,9 @@ namespace ICS4U_Final_Project
         // - Draws
         public void IntroScreenDraw(GameTime gameTime)
         {
+            // - game title
+            _spriteBatch.DrawString(menuTitleFont, "To The Clouds", new Vector2(60, 80), Color.White);
+
             // - cursor
             if (buttonHover == true)
                 _spriteBatch.Draw(cursorTexture, cursorHoverRect, Color.DarkGray);
@@ -443,9 +463,11 @@ namespace ICS4U_Final_Project
 
             // - bullets
             foreach (Bullet bullet in bullets)
-            {
                 bullet.Draw(_spriteBatch);
-            }
+
+            // - plane trail
+            foreach (Trail PlaneTrail in planeTrail)
+                PlaneTrail.Draw(_spriteBatch);
 
             // - plane
             _spriteBatch.Draw(planeTexture, planeLocation, null, Color.White, angle, origin, 1f, SpriteEffects.None, 0f);

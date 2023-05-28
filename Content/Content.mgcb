@@ -58,6 +58,13 @@
 /processorParam:TextureFormat=Compressed
 /build:following.spritefont
 
+#begin Menu Title Font.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Menu Title Font.spritefont
+
 #begin minusbuttonnotpressed.png
 /importer:TextureImporter
 /processor:TextureProcessor
