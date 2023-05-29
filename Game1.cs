@@ -354,12 +354,16 @@ namespace ICS4U_Final_Project
                     planeAmmo -= 1;
                 }
             }
+            for (int i = 0; i < bullets.Count; i++)
+            {
+                if (bullets[i].BulletLocation.X > 1180 || bullets[i].BulletLocation.X < -100 || bullets[i].BulletLocation.Y > 820 || bullets[i].BulletLocation.Y < -100)
+                    bullets.RemoveAt(i);
+            }
             if (bulletBool)
             {
                 foreach (Bullet bullet in bullets)
                     bullet.Update();
             }
-
 
 
             if (keyboardState.IsKeyDown(Keys.RightControl) && prevKeyboardState.IsKeyUp(Keys.RightControl))
@@ -493,6 +497,11 @@ namespace ICS4U_Final_Project
 
             // - plane ammo
             _spriteBatch.DrawString(followingFont, $"Ammo: {planeAmmo}", new Vector2(40, 250), Color.White);
+
+
+            _spriteBatch.DrawString(followingFont, bullets.Count.ToString(), new Vector2(40, 300), Color.White);
+
+
 
             // - cursor
             if (buttonHover == true)

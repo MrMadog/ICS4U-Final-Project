@@ -14,7 +14,7 @@ namespace ICS4U_Final_Project
     {
         private Texture2D _texture;
         private float _rotation;
-        private int _speed;
+        private double _speed;
         private Rectangle _rectangle;
         private Vector2 _location;
         private Vector2 _shadowLocation;
@@ -24,7 +24,7 @@ namespace ICS4U_Final_Project
         private SoundEffect _soundEffect;
         private SoundEffectInstance _soundEffectInstance;
 
-        public Bullet(Texture2D texture, Vector2 location, Vector2 target, int speed, SoundEffect soundEffect)
+        public Bullet(Texture2D texture, Vector2 location, Vector2 target, double speed, SoundEffect soundEffect)
         {
             _texture = texture;
             _location = location;
@@ -34,7 +34,7 @@ namespace ICS4U_Final_Project
 
             _rectangle = new Rectangle((int)_location.X, (int)_location.Y, 16, 16);
 
-            _velocity = new Vector2((_target.X - _location.X) / Vector2.Distance(_location, _target) * _speed, (_target.Y - _location.Y) / Vector2.Distance(_location, _target) * _speed);
+            _velocity = new Vector2((_target.X - _location.X) / Vector2.Distance(_location, _target) * (float)_speed, (_target.Y - _location.Y) / Vector2.Distance(_location, _target) * (float)_speed);
 
             _rotation = GetAngle(_location, _target);
 
@@ -69,7 +69,8 @@ namespace ICS4U_Final_Project
             _shadowLocation.Y = _location.Y + 75;
 
             _rectangle.X = (int)Math.Round(_location.X);
-            _rectangle.Y = (int)Math.Round(_location.Y); 
+            _rectangle.Y = (int)Math.Round(_location.Y);
+
         }
 
         public void Draw(SpriteBatch _spriteBatch)
