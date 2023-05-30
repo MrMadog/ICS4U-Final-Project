@@ -17,6 +17,7 @@
 			- if button.Pressed()
 		- have player be able to pick plane and colour of plane at menu
 		- enemies be a certain colour that cant be picked by player
+		- maybe a new class where it randomly picks a start and end position for the enemy planes
 
 	Enemy Ideas:
 		- Planes flying across the screen randomly

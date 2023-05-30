@@ -345,7 +345,6 @@ namespace ICS4U_Final_Project
                     PlaneTrail.Update();
                 }
             }
-
             
             // - bullets
             if (keyboardState.IsKeyDown(Keys.Space) && prevKeyboardState.IsKeyUp(Keys.Space))
@@ -369,10 +368,9 @@ namespace ICS4U_Final_Project
             }
 
             // - enemies
-            for (int i = 0; i < 100; i++)
+            if (seconds % 10 == 0)
             {
-                if (i == 50)
-                    enemeyPlanes.Add(new EnemyPlane(planeTexture, bulletTexture, 2));
+                enemeyPlanes.Add(new EnemyPlane(planeTexture, bulletTexture, 2));
 
             }
 
@@ -491,8 +489,6 @@ namespace ICS4U_Final_Project
             foreach (EnemyPlane plane in enemeyPlanes)
                 plane.Draw(_spriteBatch);
 
-
-
             // - hud points
             _spriteBatch.DrawString(pointsFont, $"Points :  {points}", new Vector2(40, 40), Color.Black);
 
@@ -514,11 +510,6 @@ namespace ICS4U_Final_Project
 
             // - plane ammo
             _spriteBatch.DrawString(followingFont, $"Ammo: {planeAmmo}", new Vector2(40, 250), Color.White);
-
-
-            _spriteBatch.DrawString(followingFont, bullets.Count.ToString(), new Vector2(40, 300), Color.White);
-
-
 
             // - cursor
             if (buttonHover == true)
