@@ -27,7 +27,7 @@ namespace ICS4U_Final_Project
         List<Button> buttons;
         List<Bullet> bullets;
         List<Trail> planeTrail;
-        List<EnemyPlane> enemeyPlanes;
+        List<EnemyPlane> enemyPlanes;
  
         Texture2D planeTexture, targetTexture, coinTexture, cursorTexture, bulletTexture, planeTrailTexture;
         Texture2D plusButtonTexture, plusButtonTextureP, minusButtonTexture, minusButtonTextureP, dimScreen;
@@ -38,7 +38,7 @@ namespace ICS4U_Final_Project
         MouseState mouseState, prevMouseState;
         KeyboardState keyboardState, prevKeyboardState;
 
-        float angle, prevAngle, seconds, startTime;
+        float angle, prevAngle, seconds, startTime, seconds2, startTime2;
 
         Point mouse;
 
@@ -87,7 +87,7 @@ namespace ICS4U_Final_Project
             buttons = new List<Button>();
             bullets = new List<Bullet>();
             planeTrail = new List<Trail>();
-            enemeyPlanes = new List<EnemyPlane>();
+            enemyPlanes = new List<EnemyPlane>();
 
             planeLocation = new Vector2(540, 800);
 
@@ -246,6 +246,8 @@ namespace ICS4U_Final_Project
         }
         public void GameScreenUpdate(GameTime gameTime)
         {
+            seconds2 = (float)gameTime.TotalGameTime.TotalSeconds - startTime2;
+
             // - checking if mouse is in screen when target is attempted to be created
             if (mousePos.X > 0 && mousePos.X < 1080 && mousePos.Y > 0 && mousePos.Y < 720)
             { // - making a target on mouse click
@@ -368,12 +370,13 @@ namespace ICS4U_Final_Project
             }
 
             // - enemies
-            if (seconds % 10 == 0)
+            if (seconds2 >= 5)
             {
-                enemeyPlanes.Add(new EnemyPlane(planeTexture, bulletTexture, 2));
-
+                enemyPlanes.Add(new EnemyPlane(planeTexture, bulletTexture, 2));
+                startTime2 = (float)gameTime.TotalGameTime.TotalSeconds;
             }
-
+            foreach (EnemyPlane plane in enemyPlanes)
+                plane.Update();
 
             if (keyboardState.IsKeyDown(Keys.RightControl) && prevKeyboardState.IsKeyUp(Keys.RightControl))
             {
@@ -486,7 +489,7 @@ namespace ICS4U_Final_Project
             _spriteBatch.Draw(planeTexture, planeLocation, null, Color.White, angle, origin, 1f, SpriteEffects.None, 0f);
 
             // - enemy planes
-            foreach (EnemyPlane plane in enemeyPlanes)
+            foreach (EnemyPlane plane in enemyPlanes)
                 plane.Draw(_spriteBatch);
 
             // - hud points
@@ -510,6 +513,11 @@ namespace ICS4U_Final_Project
 
             // - plane ammo
             _spriteBatch.DrawString(followingFont, $"Ammo: {planeAmmo}", new Vector2(40, 250), Color.White);
+
+
+
+           // _spriteBatch.DrawString(followingFont, seconds2.ToString(), new Vector2(40, 300), Color.White);
+
 
             // - cursor
             if (buttonHover == true)
