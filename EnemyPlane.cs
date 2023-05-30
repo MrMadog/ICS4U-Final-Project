@@ -45,9 +45,11 @@ namespace ICS4U_Final_Project
             if (_level == 3)
                 _speed = 3;
 
-            _velocity = new Vector2((_target.X - _location.X) / Vector2.Distance(_location, _target) * (float)_speed, (_target.Y - _location.Y) / Vector2.Distance(_location, _target) * (float)_speed);
+            _velocity = new Vector2((_target.X - _location.X) / Vector2.Distance(_location, _target) , (_target.Y - _location.Y) / Vector2.Distance(_location, _target));
 
             _rotation = GetAngle(_location, _target);
+
+            _rotationOrigin = new Vector2(_planeTexture.Width / 2, _planeTexture.Height / 2);
         }
 
         public float GetAngle(Vector2 originPoint, Vector2 secondPoint)
@@ -71,7 +73,10 @@ namespace ICS4U_Final_Project
             _location.X += _velocity.X;
             _location.Y += _velocity.Y;
 
-            switch(_level )
+            _shadowLocation.X = _location.X - 30;
+            _shadowLocation.Y = _location.Y + 75;
+
+            switch (_level )
             {
                 case 1:
                     

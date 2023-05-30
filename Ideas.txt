@@ -16,8 +16,10 @@
 		- possible button class (making it easier to draw and way less code)
 			- if button.Pressed()
 		- have player be able to pick plane and colour of plane at menu
-		- enemies be a certain colour that cant be picked by player
+		- enemies be a certain colour that cant be picked by player (black probably)
 		- maybe a new class where it randomly picks a start and end position for the enemy planes
+		- press escape during gameplay
+			- pause game and have a quit, resume, restart, options
 
 	Enemy Ideas:
 		- Planes flying across the screen randomly
