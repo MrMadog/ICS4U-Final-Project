@@ -169,6 +169,18 @@
 /processorParam:TextureFormat=Color
 /build:rectangle.png
 
+#begin ship_0001_black.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:ship_0001_black.png
+
 #begin target.png
 /importer:TextureImporter
 /processor:TextureProcessor

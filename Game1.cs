@@ -28,9 +28,16 @@ namespace ICS4U_Final_Project
         List<Bullet> bullets;
         List<Trail> planeTrail;
         List<EnemyPlane> enemyPlanes;
+        List<Texture2D> userPlaneTextures;
+        List<Texture2D> enemyPlaneTextures;
  
-        Texture2D planeTexture, targetTexture, coinTexture, cursorTexture, bulletTexture, planeTrailTexture;
+        Texture2D targetTexture, coinTexture, cursorTexture, bulletTexture, planeTrailTexture;
         Texture2D plusButtonTexture, plusButtonTextureP, minusButtonTexture, minusButtonTextureP, dimScreen;
+
+        // user planes
+        Texture2D userPlane, userPlaneTexture1, userPlaneTexture2, userPlaneTexture3, userPlaneTexture4, userPlaneTexture5, userPlaneTexture6;
+        // enemy planes
+        Texture2D enemyPlane, enemyPlaneTexture1, enemyPlaneTexture2, enemyPlaneTexture3, enemyPlaneTexture4, enemyPlaneTexture5, enemyPlaneTexture6;
 
         Rectangle targetRect, coinRect, cursorRect, cursorHoverRect;
         Rectangle dimScreenRect, upgradeMenuRect, upgradeMenuInfoRect, upgradeMenuPointsRect;
@@ -88,6 +95,8 @@ namespace ICS4U_Final_Project
             bullets = new List<Bullet>();
             planeTrail = new List<Trail>();
             enemyPlanes = new List<EnemyPlane>();
+            userPlaneTextures = new List<Texture2D>();
+            enemyPlaneTextures = new List<Texture2D>();
 
             planeLocation = new Vector2(540, 800);
 
@@ -125,14 +134,18 @@ namespace ICS4U_Final_Project
             buttons.Add(new Button(plusButtonTexture, plusButtonTextureP, new Rectangle(590, 400, 36, 36))); // 6
             buttons.Add(new Button(plusButtonTexture, plusButtonTextureP, new Rectangle(590, 480, 36, 36))); // 7
 
-        }
 
+            // userPlaneTextures.Add();
+
+            enemyPlaneTextures.Add(enemyPlaneTexture1);
+
+        }
+        
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             
             // - textures
-            planeTexture = Content.Load<Texture2D>("plane");
             targetTexture = Content.Load<Texture2D>("target");
             coinTexture = Content.Load<Texture2D>("circle");
             cursorTexture = Content.Load<Texture2D>("cursor");
@@ -143,6 +156,12 @@ namespace ICS4U_Final_Project
             dimScreen = Content.Load<Texture2D>("rectangle");
             bulletTexture = Content.Load<Texture2D>("planeBullet");
             planeTrailTexture = Content.Load<Texture2D>("circle");
+
+            // - user planes
+            userPlaneTexture1 = Content.Load<Texture2D>("plane");
+
+            // - enemy planes
+            enemyPlaneTexture1 = Content.Load<Texture2D>("ship_0001_black");
 
             // - fonts
             pointsFont = Content.Load<SpriteFont>("points");
@@ -184,6 +203,10 @@ namespace ICS4U_Final_Project
                 buttons[i].Update();
 
             buttonHover = false;
+
+            userPlane = userPlaneTexture1;
+            enemyPlane = enemyPlaneTexture1;
+
 
             if (screen == Screen.Intro)
                 IntroScreenUpdate(gameTime);
@@ -275,7 +298,7 @@ namespace ICS4U_Final_Project
             // - rotation and direction of plane
             planeDirection = target - planeLocation;
             planeDirection.Normalize();
-            origin = new Vector2(planeTexture.Width / 2, planeTexture.Height / 2);
+            origin = new Vector2(userPlane.Width / 2, userPlane.Height / 2);
 
             // - boost
             if (keyboardState.IsKeyDown(Keys.LeftShift))
@@ -372,7 +395,9 @@ namespace ICS4U_Final_Project
             // - enemies
             if (seconds2 >= 5)
             {
-                enemyPlanes.Add(new EnemyPlane(planeTexture, bulletTexture, 2));
+                enemyPlane = enemyPlaneTextures[generator.Next(0, enemyPlaneTextures.Count)];
+
+                enemyPlanes.Add(new EnemyPlane(enemyPlane, bulletTexture, 2));
                 startTime2 = (float)gameTime.TotalGameTime.TotalSeconds;
             }
             foreach (EnemyPlane plane in enemyPlanes)
@@ -475,7 +500,7 @@ namespace ICS4U_Final_Project
                 _spriteBatch.Draw(targetTexture, targetRect, Color.White);
 
             // - plane shadow
-            _spriteBatch.Draw(planeTexture, planeShadowLocation, null, Color.Black * 0.4f, angle, origin, 1f, SpriteEffects.None, 0f);
+            _spriteBatch.Draw(userPlane, planeShadowLocation, null, Color.Black * 0.4f, angle, origin, 1f, SpriteEffects.None, 0f);
 
             // - bullets
             foreach (Bullet bullet in bullets)
@@ -486,7 +511,7 @@ namespace ICS4U_Final_Project
                 PlaneTrail.Draw(_spriteBatch);
 
             // - plane
-            _spriteBatch.Draw(planeTexture, planeLocation, null, Color.White, angle, origin, 1f, SpriteEffects.None, 0f);
+            _spriteBatch.Draw(userPlane, planeLocation, null, Color.White, angle, origin, 1f, SpriteEffects.None, 0f);
 
             // - enemy planes
             foreach (EnemyPlane plane in enemyPlanes)
