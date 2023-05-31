@@ -14,23 +14,21 @@ namespace ICS4U_Final_Project
         private Rectangle _rectangle;
         private Vector2 _spawnLocation;
         private Texture2D _texture;
+        float alpha;
 
         public Trail(Texture2D texture, Vector2 spawnLocation)
         {
             _texture = texture;
             _spawnLocation = spawnLocation;
 
-            _rectangle = new Rectangle((int)_spawnLocation.X, (int)_spawnLocation.Y, 0, 0);
+            _rectangle = new Rectangle((int)_spawnLocation.X, (int)_spawnLocation.Y, 15, 15);
+            alpha = 1f;
 
         }
 
-        public int trailWidth
+        public int circleWidth
         {
             get { return _rectangle.Width; }
-        }
-        public int trailHeight
-        {
-            get { return _rectangle.Height; }
         }
 
         public void Update()
@@ -38,13 +36,14 @@ namespace ICS4U_Final_Project
             _rectangle.Width += 1;
             _rectangle.Height += 1;
 
-            _rectangle.X -= 2;
-            _rectangle.Y -= 2;
+            //_rectangle.X -= 1;
+            //_rectangle.Y -= 1;
+            alpha -= 0.007f;
         }
 
         public void Draw(SpriteBatch _spriteBatch)
         {
-            _spriteBatch.Draw(_texture, _rectangle, Color.White * 0.3f);
+            _spriteBatch.Draw(_texture, _rectangle, Color.White * alpha);
         }
     }
 }

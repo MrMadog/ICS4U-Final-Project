@@ -36,8 +36,9 @@ namespace ICS4U_Final_Project
 
         // user planes
         Texture2D userPlane, userPlaneTexture1, userPlaneTexture2, userPlaneTexture3, userPlaneTexture4, userPlaneTexture5, userPlaneTexture6;
+        Texture2D userPlaneTexture7, userPlaneTexture8, userPlaneTexture9, userPlaneTexture10, userPlaneTexture11;
         // enemy planes
-        Texture2D enemyPlane, enemyPlaneTexture1, enemyPlaneTexture2, enemyPlaneTexture3, enemyPlaneTexture4, enemyPlaneTexture5, enemyPlaneTexture6;
+        Texture2D enemyPlane, enemyPlaneTexture1, enemyPlaneTexture2, enemyPlaneTexture3, enemyPlaneTexture4, enemyPlaneTexture6, enemyPlaneTexture8;
 
         Rectangle targetRect, coinRect, cursorRect, cursorHoverRect;
         Rectangle dimScreenRect, upgradeMenuRect, upgradeMenuInfoRect, upgradeMenuPointsRect;
@@ -45,7 +46,7 @@ namespace ICS4U_Final_Project
         MouseState mouseState, prevMouseState;
         KeyboardState keyboardState, prevKeyboardState;
 
-        float angle, prevAngle, seconds, startTime, seconds2, startTime2;
+        float angle, prevAngle, seconds, startTime, seconds2, startTime2, seconds3, startTime3;
 
         Point mouse;
 
@@ -138,9 +139,13 @@ namespace ICS4U_Final_Project
             // userPlaneTextures.Add();
 
             enemyPlaneTextures.Add(enemyPlaneTexture1);
-
+            enemyPlaneTextures.Add(enemyPlaneTexture2);
+            enemyPlaneTextures.Add(enemyPlaneTexture3);
+            enemyPlaneTextures.Add(enemyPlaneTexture4);
+            enemyPlaneTextures.Add(enemyPlaneTexture6);
+            enemyPlaneTextures.Add(enemyPlaneTexture8);
         }
-        
+
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -158,10 +163,26 @@ namespace ICS4U_Final_Project
             planeTrailTexture = Content.Load<Texture2D>("circle");
 
             // - user planes
-            userPlaneTexture1 = Content.Load<Texture2D>("plane");
-
+            userPlaneTexture1 = Content.Load<Texture2D>("plane 1");
+            userPlaneTexture2 = Content.Load<Texture2D>("plane 2");
+            userPlaneTexture3 = Content.Load<Texture2D>("plane 3");
+            userPlaneTexture4 = Content.Load<Texture2D>("plane 4");
+            userPlaneTexture5 = Content.Load<Texture2D>("plane 5");
+            userPlaneTexture6 = Content.Load<Texture2D>("plane 6");
+            userPlaneTexture7 = Content.Load<Texture2D>("plane 7");
+            userPlaneTexture8 = Content.Load<Texture2D>("plane 8");
+            userPlaneTexture9 = Content.Load<Texture2D>("plane 9");
+            userPlaneTexture10 = Content.Load<Texture2D>("plane 10");
+            userPlaneTexture11 = Content.Load<Texture2D>("plane 11");
             // - enemy planes
-            enemyPlaneTexture1 = Content.Load<Texture2D>("ship_0001_black");
+            enemyPlaneTexture1 = Content.Load<Texture2D>("enemy plane 1");
+            enemyPlaneTexture2 = Content.Load<Texture2D>("enemy plane 2");
+            enemyPlaneTexture3 = Content.Load<Texture2D>("enemy plane 3");
+            enemyPlaneTexture4 = Content.Load<Texture2D>("enemy plane 4");
+            enemyPlaneTexture6 = Content.Load<Texture2D>("enemy plane 5");
+            enemyPlaneTexture8 = Content.Load<Texture2D>("enemy plane 6");
+
+
 
             // - fonts
             pointsFont = Content.Load<SpriteFont>("points");
@@ -270,6 +291,7 @@ namespace ICS4U_Final_Project
         public void GameScreenUpdate(GameTime gameTime)
         {
             seconds2 = (float)gameTime.TotalGameTime.TotalSeconds - startTime2;
+            seconds3 = (float)gameTime.TotalGameTime.TotalSeconds - startTime3;
 
             // - checking if mouse is in screen when target is attempted to be created
             if (mousePos.X > 0 && mousePos.X < 1080 && mousePos.Y > 0 && mousePos.Y < 720)
@@ -360,17 +382,22 @@ namespace ICS4U_Final_Project
             // - plane shadow and trail
             planeShadowLocation = new Vector2(planeLocation.X - 30, planeLocation.Y + 75);
 
-            if (planeTrail.Count < 8) 
-                planeTrail.Add(new Trail(planeTrailTexture, planeLocation));
-            foreach (Trail PlaneTrail in planeTrail)
+            if (seconds3 >= 0.4)
             {
-                if (PlaneTrail.trailWidth >= 50)
+                if (planeTrail.Count < 12)
+                    planeTrail.Add(new Trail(planeTrailTexture, planeLocation));
+                for (int i = 0; i < planeTrail.Count; i++)
                 {
-                    planeTrail.Remove(PlaneTrail);
-                    PlaneTrail.Update();
+                    if (planeTrail[i].circleWidth >= 50)
+                    {
+                        planeTrail.RemoveAt(i);
+                    }
                 }
+                startTime3 = (float)gameTime.TotalGameTime.TotalSeconds;
             }
-            
+            foreach (Trail PlaneTrail in planeTrail)
+                PlaneTrail.Update();
+
             // - bullets
             if (keyboardState.IsKeyDown(Keys.Space) && prevKeyboardState.IsKeyUp(Keys.Space))
             {
@@ -397,7 +424,7 @@ namespace ICS4U_Final_Project
             {
                 enemyPlane = enemyPlaneTextures[generator.Next(0, enemyPlaneTextures.Count)];
 
-                enemyPlanes.Add(new EnemyPlane(enemyPlane, bulletTexture, 2));
+                enemyPlanes.Add(new EnemyPlane(enemyPlaneTextures[generator.Next(0, 5)], bulletTexture, 2));
                 startTime2 = (float)gameTime.TotalGameTime.TotalSeconds;
             }
             foreach (EnemyPlane plane in enemyPlanes)
@@ -502,6 +529,10 @@ namespace ICS4U_Final_Project
             // - plane shadow
             _spriteBatch.Draw(userPlane, planeShadowLocation, null, Color.Black * 0.4f, angle, origin, 1f, SpriteEffects.None, 0f);
 
+            // - enemy planes
+            foreach (EnemyPlane plane in enemyPlanes)
+                plane.Draw(_spriteBatch);
+
             // - bullets
             foreach (Bullet bullet in bullets)
                 bullet.Draw(_spriteBatch);
@@ -512,10 +543,6 @@ namespace ICS4U_Final_Project
 
             // - plane
             _spriteBatch.Draw(userPlane, planeLocation, null, Color.White, angle, origin, 1f, SpriteEffects.None, 0f);
-
-            // - enemy planes
-            foreach (EnemyPlane plane in enemyPlanes)
-                plane.Draw(_spriteBatch);
 
             // - hud points
             _spriteBatch.DrawString(pointsFont, $"Points :  {points}", new Vector2(40, 40), Color.Black);
@@ -538,11 +565,6 @@ namespace ICS4U_Final_Project
 
             // - plane ammo
             _spriteBatch.DrawString(followingFont, $"Ammo: {planeAmmo}", new Vector2(40, 250), Color.White);
-
-
-
-           // _spriteBatch.DrawString(followingFont, seconds2.ToString(), new Vector2(40, 300), Color.White);
-
 
             // - cursor
             if (buttonHover == true)

@@ -14,7 +14,7 @@ namespace ICS4U_Final_Project
     {
         Random generator = new Random();
         private int _level;
-        private double _speed;
+        private int _speed;
         private Texture2D _planeTexture;
         private Texture2D _bulletTexture;
         private Vector2 _location;
@@ -34,18 +34,18 @@ namespace ICS4U_Final_Project
 
             _hitbox = new Circle(_location, _planeTexture.Width / 2);
 
-            _location = new Vector2(0, 300);
+            _location = new Vector2(0, generator.Next(0, 720));
 
             _target = new Vector2(1280, generator.Next(0, 720));
 
-            if (_level == 1)
-                _speed = 1;
-            if (_level == 2)
-                _speed = 2;
-            if (_level == 3)
-                _speed = 3;
+            switch (_level)
+            {
+                case 1: _speed = 1; break;
+                case 2: _speed = 2; break;
+                case 3: _speed = 3; break;
+            }
 
-            _velocity = new Vector2((_target.X - _location.X) / Vector2.Distance(_location, _target) , (_target.Y - _location.Y) / Vector2.Distance(_location, _target));
+            _velocity = new Vector2((_target.X - _location.X) / Vector2.Distance(_location, _target) * _speed, (_target.Y - _location.Y) / Vector2.Distance(_location, _target) * _speed);
 
             _rotation = GetAngle(_location, _target);
 
