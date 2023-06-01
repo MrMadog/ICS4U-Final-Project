@@ -55,7 +55,8 @@
 		- Improve UI and add onto button class(sounds)
 		- Figure out binds for everything(pin, shoot, boost)
 		- Pause bullets on menu open (done)
-		- Add sound effects for bullets
+		- Add sound effects for bullets (done)
+		- Add subtle engine sound effect
 
 
 	https://pixabay.com/sound-effects/search/gunshot/

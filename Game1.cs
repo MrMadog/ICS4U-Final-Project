@@ -46,7 +46,7 @@ namespace ICS4U_Final_Project
         MouseState mouseState, prevMouseState;
         KeyboardState keyboardState, prevKeyboardState;
 
-        float angle, prevAngle, seconds, startTime, seconds2, startTime2, seconds3, startTime3;
+        float angle, prevAngle, seconds, startTime, seconds2, startTime2, seconds3, startTime3, seconds4, startTime4;
 
         Point mouse;
 
@@ -61,6 +61,7 @@ namespace ICS4U_Final_Project
         Screen screen;
 
         Vector2 origin, planeLocation, prevPlaneLocation, planeShadowLocation, mousePos, planeDirection, target, coinSpawnCircle, coinPoints;
+        Vector2 damagePoints;
 
         Circle mouseCircle, targetCircle, coinCircle;
 
@@ -72,6 +73,7 @@ namespace ICS4U_Final_Project
         bool done = false;
         bool fadeBool = false;
         bool bulletBool = false;
+        bool hitBool = false;
 
         SpriteFont pointsFont, pointNumbers, followingFont, upgradeMenuFont, upgradeMenuInfoFont, currentFont, availablePointsFont, menuTitleFont;
 
@@ -292,6 +294,7 @@ namespace ICS4U_Final_Project
         {
             seconds2 = (float)gameTime.TotalGameTime.TotalSeconds - startTime2;
             seconds3 = (float)gameTime.TotalGameTime.TotalSeconds - startTime3;
+            seconds4 = (float)gameTime.TotalGameTime.TotalSeconds - startTime4;
 
             // - checking if mouse is in screen when target is attempted to be created
             if (mousePos.X > 0 && mousePos.X < 1080 && mousePos.Y > 0 && mousePos.Y < 720)
@@ -388,7 +391,7 @@ namespace ICS4U_Final_Project
                     planeTrail.Add(new Trail(planeTrailTexture, planeLocation));
                 for (int i = 0; i < planeTrail.Count; i++)
                 {
-                    if (planeTrail[i].circleWidth >= 50)
+                    if (planeTrail[i].getAlpha <= 0f)
                     {
                         planeTrail.RemoveAt(i);
                     }
@@ -429,6 +432,26 @@ namespace ICS4U_Final_Project
             }
             foreach (EnemyPlane plane in enemyPlanes)
                 plane.Update();
+
+            // - hitting enemies
+            foreach (EnemyPlane enemy in enemyPlanes)
+            {
+                for (int i = 0; i < bullets.Count; i++)
+                {
+                    if (enemy.Contains(bullets[i].BulletLocation))
+                    {
+                        hitBool = true;
+                        bullets.RemoveAt(i);
+                        startTime4 = (float)gameTime.TotalGameTime.TotalSeconds;
+                        damagePoints = enemy.GetLocation;
+                        enemy.planeHealth -= 50;
+                    }
+                }
+            }
+            for (int i = 0; i < enemyPlanes.Count; i++)
+                if (enemyPlanes[i].planeHealth <= 0)
+                    enemyPlanes.RemoveAt(i);
+
 
             if (keyboardState.IsKeyDown(Keys.RightControl) && prevKeyboardState.IsKeyUp(Keys.RightControl))
             {
@@ -565,6 +588,10 @@ namespace ICS4U_Final_Project
 
             // - plane ammo
             _spriteBatch.DrawString(followingFont, $"Ammo: {planeAmmo}", new Vector2(40, 250), Color.White);
+
+            // - hitting enemies
+            if (seconds4 < 3 && hitBool == true)
+                _spriteBatch.DrawString(pointNumbers, "+100", damagePoints, Color.White);
 
             // - cursor
             if (buttonHover == true)

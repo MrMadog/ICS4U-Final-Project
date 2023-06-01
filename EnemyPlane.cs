@@ -15,6 +15,7 @@ namespace ICS4U_Final_Project
         Random generator = new Random();
         private int _level;
         private int _speed;
+        private int _planeHealth;
         private Texture2D _planeTexture;
         private Texture2D _bulletTexture;
         private Vector2 _location;
@@ -65,6 +66,17 @@ namespace ICS4U_Final_Project
         public bool Contains(Vector2 point)
         {
             return _hitbox.Contains(point);
+        }
+
+        public Vector2 GetLocation
+        {
+            get { return _location; }
+        }
+
+        public int planeHealth
+        {
+            get { return _planeHealth;  }
+            set { _planeHealth = value; }
         }
 
         public void Update()
