@@ -583,7 +583,7 @@ namespace ICS4U_Final_Project
             else
                 _spriteBatch.DrawString(followingFont, "Following: Cursor", new Vector2(40, 150), Color.White);
 
-            // - plane health
+            // - plane health 
             _spriteBatch.DrawString(followingFont, $"Health: {planeHealth}", new Vector2(40, 200), Color.White);
 
             // - plane ammo
