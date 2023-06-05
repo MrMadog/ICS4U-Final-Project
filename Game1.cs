@@ -38,7 +38,7 @@ namespace ICS4U_Final_Project
         Texture2D userPlane, userPlaneTexture1, userPlaneTexture2, userPlaneTexture3, userPlaneTexture4, userPlaneTexture5, userPlaneTexture6;
         Texture2D userPlaneTexture7, userPlaneTexture8, userPlaneTexture9, userPlaneTexture10, userPlaneTexture11;
         // enemy planes
-        Texture2D enemyPlane, enemyPlaneTexture1, enemyPlaneTexture2, enemyPlaneTexture3, enemyPlaneTexture4, enemyPlaneTexture6, enemyPlaneTexture8;
+        Texture2D enemyPlane, enemyPlaneTexture1, enemyPlaneTexture2, enemyPlaneTexture3, enemyPlaneTexture4, enemyPlaneTexture5, enemyPlaneTexture6;
 
         Rectangle targetRect, coinRect, cursorRect, cursorHoverRect;
         Rectangle dimScreenRect, upgradeMenuRect, upgradeMenuInfoRect, upgradeMenuPointsRect;
@@ -144,8 +144,8 @@ namespace ICS4U_Final_Project
             enemyPlaneTextures.Add(enemyPlaneTexture2);
             enemyPlaneTextures.Add(enemyPlaneTexture3);
             enemyPlaneTextures.Add(enemyPlaneTexture4);
+            enemyPlaneTextures.Add(enemyPlaneTexture5);
             enemyPlaneTextures.Add(enemyPlaneTexture6);
-            enemyPlaneTextures.Add(enemyPlaneTexture8);
         }
 
         protected override void LoadContent()
@@ -181,8 +181,8 @@ namespace ICS4U_Final_Project
             enemyPlaneTexture2 = Content.Load<Texture2D>("enemy plane 2");
             enemyPlaneTexture3 = Content.Load<Texture2D>("enemy plane 3");
             enemyPlaneTexture4 = Content.Load<Texture2D>("enemy plane 4");
-            enemyPlaneTexture6 = Content.Load<Texture2D>("enemy plane 5");
-            enemyPlaneTexture8 = Content.Load<Texture2D>("enemy plane 6");
+            enemyPlaneTexture5 = Content.Load<Texture2D>("enemy plane 5");
+            enemyPlaneTexture6 = Content.Load<Texture2D>("enemy plane 6");
 
 
 
@@ -228,8 +228,6 @@ namespace ICS4U_Final_Project
             buttonHover = false;
 
             userPlane = userPlaneTexture1;
-            enemyPlane = enemyPlaneTexture1;
-
 
             if (screen == Screen.Intro)
                 IntroScreenUpdate(gameTime);
@@ -423,15 +421,14 @@ namespace ICS4U_Final_Project
             }
 
             // - enemies
-            if (keyboardState.IsKeyDown(Keys.H) && prevKeyboardState.IsKeyUp(Keys.H)) // seconds2 >= 3
+            if (seconds2 >= 3)
             {
                 enemyPlane = enemyPlaneTextures[generator.Next(0, enemyPlaneTextures.Count)];
 
-                enemyPlanes.Add(new EnemyPlane(enemyPlaneTextures[2], bulletTexture, 2));
+                enemyPlanes.Add(new EnemyPlane(enemyPlane, bulletTexture, 2, planeShot));
                 startTime2 = (float)gameTime.TotalGameTime.TotalSeconds;
             }
-            foreach (EnemyPlane plane in enemyPlanes)
-                plane.Update();
+
 
             // - hitting enemies
             foreach (EnemyPlane enemy in enemyPlanes)
@@ -448,9 +445,14 @@ namespace ICS4U_Final_Project
                     }
                 }
             }
+
             for (int i = 0; i < enemyPlanes.Count; i++)
                 if (enemyPlanes[i].planeHealth <= 0)
                     enemyPlanes.RemoveAt(i);
+
+            foreach (EnemyPlane plane in enemyPlanes)
+                plane.Update(gameTime);
+
 
 
             if (keyboardState.IsKeyDown(Keys.RightControl) && prevKeyboardState.IsKeyUp(Keys.RightControl))
@@ -592,10 +594,6 @@ namespace ICS4U_Final_Project
             // - hitting enemies
             if (seconds4 < 3 && hitBool == true)
                 _spriteBatch.DrawString(pointNumbers, "+100", damagePoints, Color.White);
-
-            _spriteBatch.DrawString(pointNumbers, seconds2.ToString(), new Vector2(40, 300), Color.White);
-            _spriteBatch.DrawString(pointNumbers, enemyPlanes.Count.ToString(), new Vector2(40, 350), Color.White);
-
 
             // - cursor
             if (buttonHover == true)

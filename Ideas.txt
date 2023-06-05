@@ -21,6 +21,7 @@
 		- press escape during gameplay
 			- pause game and have a quit, resume, restart, options
 
+
 	Enemy Ideas:
 		- Planes flying across the screen randomly
 		- People or things on the ground shooting up at my plane
@@ -30,6 +31,7 @@
 		- maybe use a class for enemy planes (maybe part of a class for user plane aswell)
 		- points ("100") appearing every kill or coin gotten moving up left
 		- damage ("30") appearing every hit to enemy moving down right
+		- shoot with 2 bullets every couple seconds ( - -              - -                - - )
 
 	Menu Screen: 
 		- start button, quit game button, keybinds settings, choose plane button
