@@ -423,11 +423,11 @@ namespace ICS4U_Final_Project
             }
 
             // - enemies
-            if (seconds2 >= 5)
+            if (keyboardState.IsKeyDown(Keys.H) && prevKeyboardState.IsKeyUp(Keys.H)) // seconds2 >= 3
             {
                 enemyPlane = enemyPlaneTextures[generator.Next(0, enemyPlaneTextures.Count)];
 
-                enemyPlanes.Add(new EnemyPlane(enemyPlaneTextures[generator.Next(0, 5)], bulletTexture, 2));
+                enemyPlanes.Add(new EnemyPlane(enemyPlaneTextures[2], bulletTexture, 2));
                 startTime2 = (float)gameTime.TotalGameTime.TotalSeconds;
             }
             foreach (EnemyPlane plane in enemyPlanes)
@@ -592,6 +592,10 @@ namespace ICS4U_Final_Project
             // - hitting enemies
             if (seconds4 < 3 && hitBool == true)
                 _spriteBatch.DrawString(pointNumbers, "+100", damagePoints, Color.White);
+
+            _spriteBatch.DrawString(pointNumbers, seconds2.ToString(), new Vector2(40, 300), Color.White);
+            _spriteBatch.DrawString(pointNumbers, enemyPlanes.Count.ToString(), new Vector2(40, 350), Color.White);
+
 
             // - cursor
             if (buttonHover == true)
