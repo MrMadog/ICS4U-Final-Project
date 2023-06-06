@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,6 @@ namespace ICS4U_Final_Project
         Random generator = new Random();
         private int _level;
         private int _speed;
-        private int _bulletSpeed;
         private int _planeHealth;
         private Texture2D _planeTexture;
         private Texture2D _bulletTexture;
@@ -23,11 +23,10 @@ namespace ICS4U_Final_Project
         private Vector2 _bulletLocation;
         private Vector2 _shadowLocation;
         private Vector2 _velocity;
-        private Vector2 _bulletVelocity;
         private Vector2 _rotationOrigin;
         private Vector2 _target;
         private Circle _hitbox;
-        private float _rotation, seconds, startTime;
+        private float _rotation, seconds, startTime, seconds2, startTime2;
         private List<Bullet> enemyBullets = new List<Bullet>();
         private bool bulletBool = false;
         private SoundEffect _bulletSound;
@@ -44,24 +43,18 @@ namespace ICS4U_Final_Project
             _location = new Vector2(0, generator.Next(0, 720));
 
             _bulletLocation = _location;
-            _bulletLocation.X += _planeTexture.Width / 2;
-            _bulletLocation.X -= _bulletTexture.Width / 2;
-            _bulletLocation.Y += _planeTexture.Height / 2;
-            _bulletLocation.Y -= _bulletTexture.Height / 2;
 
             _target = new Vector2(1280, generator.Next(0, 720));
 
             switch (_level)
             {
-                case 1: _speed = 1; planeHealth = 100; _bulletSpeed = 2; break;
-                case 2: _speed = 2; planeHealth = 200; _bulletSpeed = 3; break;
-                case 3: _speed = 3; planeHealth = 400; _bulletSpeed = 4; break;
-                default: _speed = 1; planeHealth = 100; _bulletSpeed = 2; break;
+                case 1: _speed = 1; planeHealth = 100; break;
+                case 2: _speed = 2; planeHealth = 200; break;
+                case 3: _speed = 3; planeHealth = 400; break;
+                default: _speed = 1; planeHealth = 100; break;
             }
 
-
             _velocity = new Vector2((_target.X - _location.X) / Vector2.Distance(_location, _target) * _speed, (_target.Y - _location.Y) / Vector2.Distance(_location, _target) * _speed);
-            //_bulletVelocity = new Vector2((_target.X - _location.X) / Vector2.Distance(_location, _target) * _bulletSpeed, (_target.Y - _location.Y) / Vector2.Distance(_location, _target) * _bulletSpeed);
 
             _rotation = GetAngle(_location, _target);
 
@@ -83,11 +76,26 @@ namespace ICS4U_Final_Project
             return _hitbox.Contains(point);
         }
 
+        public Vector2 GetBulletLocation
+        {
+            get { return _bulletLocation; }
+        }
+
         public Vector2 GetLocation
         {
             get { return _location; }
         }
+        /*
+        public int getlistCount
+        {
+            get { return enemyBullets.Count; }
+        }
 
+        public float getSeconds
+        {
+            get { return seconds; }
+        }
+        */
         public int planeHealth
         {
             get { return _planeHealth;  }
@@ -97,7 +105,7 @@ namespace ICS4U_Final_Project
         public void Update(GameTime gameTime)
         {
             seconds = (float)gameTime.TotalGameTime.TotalSeconds - startTime;
-
+            seconds2 = (float)gameTime.TotalGameTime.TotalSeconds - startTime2;
 
             _location.X += _velocity.X;
             _location.Y += _velocity.Y;
@@ -108,10 +116,25 @@ namespace ICS4U_Final_Project
             _bulletLocation.X += _velocity.X;
             _bulletLocation.Y += _velocity.Y;
 
-            if (seconds >= 5)
+
+            if (seconds >= 2)
             {
                 enemyBullets.Add(new Bullet(_bulletTexture, _bulletLocation, _target, 3, _bulletSound));
                 startTime = (float)gameTime.TotalGameTime.TotalSeconds;
+            }
+
+            if (seconds2 >= 2.5)
+            {
+                enemyBullets.Add(new Bullet(_bulletTexture, _bulletLocation, _target, 3, _bulletSound));
+                startTime = (float)gameTime.TotalGameTime.TotalSeconds;
+                startTime2 = (float)gameTime.TotalGameTime.TotalSeconds;
+            }
+
+
+            for (int i = 0; i < enemyBullets.Count; i++)
+            {
+                if (enemyBullets[i].BulletLocation.X > 1180 || enemyBullets[i].BulletLocation.X < -100 || enemyBullets[i].BulletLocation.Y > 820 || enemyBullets[i].BulletLocation.Y < -100)
+                    enemyBullets.RemoveAt(i);
             }
 
             foreach (Bullet bullet in enemyBullets)
@@ -121,12 +144,11 @@ namespace ICS4U_Final_Project
         }
         public void Draw(SpriteBatch _spriteBatch)
         {
-            _spriteBatch.Draw(_planeTexture, _location, null, Color.White, _rotation, _rotationOrigin, 1f, SpriteEffects.None, 0f);    // enemy plane
-            _spriteBatch.Draw(_planeTexture, _shadowLocation, null, Color.Black * 0.4f, _rotation, _rotationOrigin, 1f, SpriteEffects.None, 0f);    // enemy plane shadow
-
             foreach (Bullet bullet in enemyBullets)
                 bullet.Draw(_spriteBatch);
-        }
 
+            _spriteBatch.Draw(_planeTexture, _location, null, Color.White, _rotation, _rotationOrigin, 1f, SpriteEffects.None, 0f);    // enemy plane
+            _spriteBatch.Draw(_planeTexture, _shadowLocation, null, Color.Black * 0.4f, _rotation, _rotationOrigin, 1f, SpriteEffects.None, 0f);    // enemy plane shadow
+        }
     }
 }

@@ -70,7 +70,6 @@ namespace ICS4U_Final_Project
 
             _rectangle.X = (int)Math.Round(_location.X);
             _rectangle.Y = (int)Math.Round(_location.Y);
-
         }
 
         public void Draw(SpriteBatch _spriteBatch)

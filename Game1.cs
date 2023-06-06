@@ -591,6 +591,15 @@ namespace ICS4U_Final_Project
             // - plane ammo
             _spriteBatch.DrawString(followingFont, $"Ammo: {planeAmmo}", new Vector2(40, 250), Color.White);
 
+            /*
+            if (enemyPlanes.Count > 0)
+            {
+                _spriteBatch.DrawString(followingFont, enemyPlanes[0].getlistCount.ToString(), new Vector2(40, 300), Color.White);
+                _spriteBatch.DrawString(followingFont, enemyPlanes[0].getSeconds.ToString(), new Vector2(40, 350), Color.White);
+            }
+            */
+
+
             // - hitting enemies
             if (seconds4 < 3 && hitBool == true)
                 _spriteBatch.DrawString(pointNumbers, "+100", damagePoints, Color.White);
