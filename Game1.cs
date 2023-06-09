@@ -26,11 +26,13 @@ namespace ICS4U_Final_Project
 
         List<Button> buttons;
         List<Bullet> bullets;
+        List<Bullet> enemyBullets;
         List<Trail> planeTrail;
         List<EnemyPlane> enemyPlanes;
         List<Texture2D> userPlaneTextures;
         List<Texture2D> enemyPlaneTextures;
- 
+        List<Texture2D> explosionTextures;
+
         Texture2D targetTexture, coinTexture, cursorTexture, bulletTexture, planeTrailTexture;
         Texture2D plusButtonTexture, plusButtonTextureP, minusButtonTexture, minusButtonTextureP, dimScreen;
 
@@ -40,13 +42,15 @@ namespace ICS4U_Final_Project
         // enemy planes
         Texture2D enemyPlane, enemyPlaneTexture1, enemyPlaneTexture2, enemyPlaneTexture3, enemyPlaneTexture4, enemyPlaneTexture5, enemyPlaneTexture6;
 
+        Texture2D explosionTexture, explo1, explo2, explo3, explo4, explo5;
+
         Rectangle targetRect, coinRect, cursorRect, cursorHoverRect;
         Rectangle dimScreenRect, upgradeMenuRect, upgradeMenuInfoRect, upgradeMenuPointsRect;
 
         MouseState mouseState, prevMouseState;
         KeyboardState keyboardState, prevKeyboardState;
 
-        float angle, prevAngle, seconds, startTime, seconds2, startTime2, seconds3, startTime3, seconds4, startTime4;
+        float angle, prevAngle, seconds, startTime, seconds2, startTime2, seconds3, startTime3, seconds4, startTime4, seconds5, startTime5;
 
         Point mouse;
 
@@ -55,7 +59,7 @@ namespace ICS4U_Final_Project
             Intro, Game, Outro, Upgrade
         }
 
-        int coinSpawnX, coinSpawnY, points, totalPoints;
+        int coinSpawnX, coinSpawnY, points, totalPoints, i;
         int boostAmount, totalBoost, planeHealth, totalPlaneHealth, planeAmmo;
 
         Screen screen;
@@ -74,6 +78,8 @@ namespace ICS4U_Final_Project
         bool fadeBool = false;
         bool bulletBool = false;
         bool hitBool = false;
+        bool userHit = false;
+        bool explosion = false;
 
         SpriteFont pointsFont, pointNumbers, followingFont, upgradeMenuFont, upgradeMenuInfoFont, currentFont, availablePointsFont, menuTitleFont;
 
@@ -96,10 +102,12 @@ namespace ICS4U_Final_Project
 
             buttons = new List<Button>();
             bullets = new List<Bullet>();
+            enemyBullets = new List<Bullet>();
             planeTrail = new List<Trail>();
             enemyPlanes = new List<EnemyPlane>();
             userPlaneTextures = new List<Texture2D>();
             enemyPlaneTextures = new List<Texture2D>();
+            explosionTextures = new List<Texture2D>();
 
             planeLocation = new Vector2(540, 800);
 
@@ -124,6 +132,8 @@ namespace ICS4U_Final_Project
 
             colour = new Color(0, 0, 0, 0);
 
+            i = 0;
+
             base.Initialize();
 
             // - minus buttons
@@ -136,6 +146,14 @@ namespace ICS4U_Final_Project
             buttons.Add(new Button(plusButtonTexture, plusButtonTextureP, new Rectangle(590, 320, 36, 36))); // 5
             buttons.Add(new Button(plusButtonTexture, plusButtonTextureP, new Rectangle(590, 400, 36, 36))); // 6
             buttons.Add(new Button(plusButtonTexture, plusButtonTextureP, new Rectangle(590, 480, 36, 36))); // 7
+
+
+            // explosion Textures
+            explosionTextures.Add(explo1);
+            explosionTextures.Add(explo2);
+            explosionTextures.Add(explo3);
+            explosionTextures.Add(explo4);
+            explosionTextures.Add(explo5);
 
 
             // userPlaneTextures.Add();
@@ -183,6 +201,14 @@ namespace ICS4U_Final_Project
             enemyPlaneTexture4 = Content.Load<Texture2D>("enemy plane 4");
             enemyPlaneTexture5 = Content.Load<Texture2D>("enemy plane 5");
             enemyPlaneTexture6 = Content.Load<Texture2D>("enemy plane 6");
+
+
+            // - explosion Textures
+            explo1 = Content.Load<Texture2D>("tile_0004");
+            explo2 = Content.Load<Texture2D>("tile_0005");
+            explo3 = Content.Load<Texture2D>("tile_0006");
+            explo4 = Content.Load<Texture2D>("tile_0007");
+            explo5 = Content.Load<Texture2D>("tile_0008");
 
 
 
@@ -293,6 +319,7 @@ namespace ICS4U_Final_Project
             seconds2 = (float)gameTime.TotalGameTime.TotalSeconds - startTime2;
             seconds3 = (float)gameTime.TotalGameTime.TotalSeconds - startTime3;
             seconds4 = (float)gameTime.TotalGameTime.TotalSeconds - startTime4;
+            seconds5 = (float)gameTime.TotalGameTime.TotalSeconds - startTime5;
 
             // - checking if mouse is in screen when target is attempted to be created
             if (mousePos.X > 0 && mousePos.X < 1080 && mousePos.Y > 0 && mousePos.Y < 720)
@@ -357,7 +384,7 @@ namespace ICS4U_Final_Project
             // - swapping to upgrade menu / back
             if (keyboardState.IsKeyDown(Keys.Tab))
                 screen = Screen.Upgrade;
-            else 
+            else
                 screen = Screen.Game;
 
             // - previous action things
@@ -421,14 +448,20 @@ namespace ICS4U_Final_Project
             }
 
             // - enemies
-            if (seconds2 >= 3)
+            if (seconds2 >= 5)
             {
                 enemyPlane = enemyPlaneTextures[generator.Next(0, enemyPlaneTextures.Count)];
 
-                enemyPlanes.Add(new EnemyPlane(enemyPlane, bulletTexture, 2, planeShot));
+                enemyPlanes.Add(new EnemyPlane(enemyPlane, bulletTexture, 2, planeShot, gameTime));
                 startTime2 = (float)gameTime.TotalGameTime.TotalSeconds;
+                startTime5 = (float)gameTime.TotalGameTime.TotalSeconds;
             }
-
+            // ---------------------------------------- where i left off ------------------------------
+            foreach (EnemyPlane enemy in enemyPlanes)
+            {
+                if (seconds5 >= 3)
+                    enemyBullets.Add(new Bullet(bulletTexture, enemy.GetBulletLocation, enemy.GetTarget, 3, planeShot));
+            }
 
             // - hitting enemies
             foreach (EnemyPlane enemy in enemyPlanes)
@@ -452,6 +485,18 @@ namespace ICS4U_Final_Project
 
             foreach (EnemyPlane plane in enemyPlanes)
                 plane.Update(gameTime);
+
+            foreach (Bullet enemyBullet in enemyBullets)
+            {
+                enemyBullet.Update();
+            }
+
+
+            if (keyboardState.IsKeyDown(Keys.RightShift) && prevKeyboardState.IsKeyUp(Keys.RightShift))
+            {
+                explosion = true;
+                startTime5 = (float)gameTime.TotalGameTime.TotalSeconds;
+            }
 
 
 
@@ -591,14 +636,16 @@ namespace ICS4U_Final_Project
             // - plane ammo
             _spriteBatch.DrawString(followingFont, $"Ammo: {planeAmmo}", new Vector2(40, 250), Color.White);
 
-            /*
-            if (enemyPlanes.Count > 0)
-            {
-                _spriteBatch.DrawString(followingFont, enemyPlanes[0].getlistCount.ToString(), new Vector2(40, 300), Color.White);
-                _spriteBatch.DrawString(followingFont, enemyPlanes[0].getSeconds.ToString(), new Vector2(40, 350), Color.White);
-            }
-            */
 
+
+            if (userHit)
+                _spriteBatch.DrawString(followingFont, "HIT", new Vector2(40, 300), Color.White);
+
+
+            foreach (Bullet enemyBullet in enemyBullets)
+            {
+                enemyBullet.Draw(_spriteBatch);
+            }
 
             // - hitting enemies
             if (seconds4 < 3 && hitBool == true)

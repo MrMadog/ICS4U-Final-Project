@@ -25,26 +25,30 @@ namespace ICS4U_Final_Project
         private Vector2 _velocity;
         private Vector2 _rotationOrigin;
         private Vector2 _target;
-        private Circle _hitbox;
+        private Circle _planeHitbox;
         private float _rotation, seconds, startTime, seconds2, startTime2;
         private List<Bullet> enemyBullets = new List<Bullet>();
         private bool bulletBool = false;
+        private bool bulletBool2 = false;
         private SoundEffect _bulletSound;
 
-        public EnemyPlane(Texture2D planeTexture, Texture2D bulletTexture, int level, SoundEffect bulletSound)
+        public EnemyPlane(Texture2D planeTexture, Texture2D bulletTexture, int level, SoundEffect bulletSound, GameTime gameTime)
         {
             _planeTexture = planeTexture;
             _bulletTexture = bulletTexture;
             _level = level;
             _bulletSound = bulletSound;
 
-            _hitbox = new Circle(_location, _planeTexture.Width / 2);
+            _planeHitbox = new Circle(_location, _planeTexture.Width / 2);
 
             _location = new Vector2(0, generator.Next(0, 720));
 
             _bulletLocation = _location;
 
             _target = new Vector2(1280, generator.Next(0, 720));
+
+            startTime = (float)gameTime.TotalGameTime.TotalSeconds;
+            startTime2 = (float)gameTime.TotalGameTime.TotalSeconds;
 
             switch (_level)
             {
@@ -73,7 +77,12 @@ namespace ICS4U_Final_Project
 
         public bool Contains(Vector2 point)
         {
-            return _hitbox.Contains(point);
+            return _planeHitbox.Contains(point);
+        }
+
+        public Vector2 GetLocation
+        {
+            get { return _location; }
         }
 
         public Vector2 GetBulletLocation
@@ -81,24 +90,14 @@ namespace ICS4U_Final_Project
             get { return _bulletLocation; }
         }
 
-        public Vector2 GetLocation
+        public Vector2 GetTarget
         {
-            get { return _location; }
-        }
-        /*
-        public int getlistCount
-        {
-            get { return enemyBullets.Count; }
+            get { return _target; }
         }
 
-        public float getSeconds
-        {
-            get { return seconds; }
-        }
-        */
         public int planeHealth
         {
-            get { return _planeHealth;  }
+            get { return _planeHealth; }
             set { _planeHealth = value; }
         }
 
@@ -116,20 +115,30 @@ namespace ICS4U_Final_Project
             _bulletLocation.X += _velocity.X;
             _bulletLocation.Y += _velocity.Y;
 
+            if (seconds >= 0 && bulletBool == false)
+            {
+                enemyBullets.Add(new Bullet(_bulletTexture, _bulletLocation, _target, 3, _bulletSound));
+                bulletBool = true;
+            }
 
-            if (seconds >= 2)
+            if (seconds2 >= 0.5 && bulletBool2 == false)
+            {
+                enemyBullets.Add(new Bullet(_bulletTexture, _bulletLocation, _target, 3, _bulletSound));
+                bulletBool2 = true;
+            }
+
+            if (seconds >= 3)
             {
                 enemyBullets.Add(new Bullet(_bulletTexture, _bulletLocation, _target, 3, _bulletSound));
                 startTime = (float)gameTime.TotalGameTime.TotalSeconds;
             }
 
-            if (seconds2 >= 2.5)
+            if (seconds2 >= 3.5)
             {
                 enemyBullets.Add(new Bullet(_bulletTexture, _bulletLocation, _target, 3, _bulletSound));
                 startTime = (float)gameTime.TotalGameTime.TotalSeconds;
                 startTime2 = (float)gameTime.TotalGameTime.TotalSeconds;
             }
-
 
             for (int i = 0; i < enemyBullets.Count; i++)
             {
@@ -137,10 +146,12 @@ namespace ICS4U_Final_Project
                     enemyBullets.RemoveAt(i);
             }
 
+
+
             foreach (Bullet bullet in enemyBullets)
                 bullet.Update();
 
-            _hitbox.Center = _location;
+            _planeHitbox.Center = _location;
         }
         public void Draw(SpriteBatch _spriteBatch)
         {
