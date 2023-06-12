@@ -1,13 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ICS4U_Final_Project
 {
@@ -114,7 +109,7 @@ namespace ICS4U_Final_Project
 
             _bulletLocation.X += _velocity.X;
             _bulletLocation.Y += _velocity.Y;
-
+            
             if (seconds >= 0 && bulletBool == false)
             {
                 enemyBullets.Add(new Bullet(_bulletTexture, _bulletLocation, _target, 3, _bulletSound));

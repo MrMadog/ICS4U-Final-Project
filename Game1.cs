@@ -51,6 +51,7 @@ namespace ICS4U_Final_Project
         KeyboardState keyboardState, prevKeyboardState;
 
         float angle, prevAngle, seconds, startTime, seconds2, startTime2, seconds3, startTime3, seconds4, startTime4, seconds5, startTime5;
+        float seconds6, startTime6;
 
         Point mouse;
 
@@ -320,6 +321,7 @@ namespace ICS4U_Final_Project
             seconds3 = (float)gameTime.TotalGameTime.TotalSeconds - startTime3;
             seconds4 = (float)gameTime.TotalGameTime.TotalSeconds - startTime4;
             seconds5 = (float)gameTime.TotalGameTime.TotalSeconds - startTime5;
+            seconds6 = (float)gameTime.TotalGameTime.TotalSeconds - startTime6;
 
             // - checking if mouse is in screen when target is attempted to be created
             if (mousePos.X > 0 && mousePos.X < 1080 && mousePos.Y > 0 && mousePos.Y < 720)
@@ -456,13 +458,30 @@ namespace ICS4U_Final_Project
                 startTime2 = (float)gameTime.TotalGameTime.TotalSeconds;
                 startTime5 = (float)gameTime.TotalGameTime.TotalSeconds;
             }
-            // ---------------------------------------- where i left off ------------------------------
+            // ---------------------------------------- where i left off -------------------------------------------------------------------------------
+            /*
             foreach (EnemyPlane enemy in enemyPlanes)
             {
                 if (seconds5 >= 3)
+                {
                     enemyBullets.Add(new Bullet(bulletTexture, enemy.GetBulletLocation, enemy.GetTarget, 3, planeShot));
-            }
+                    startTime5 = (float)gameTime.TotalGameTime.TotalSeconds;
+                }
 
+                if (seconds6 >= 3.5)
+                {
+                    enemyBullets.Add(new Bullet(bulletTexture, enemy.GetBulletLocation, enemy.GetTarget, 3, planeShot));
+                    startTime6 = (float)gameTime.TotalGameTime.TotalSeconds;
+                    startTime5 = (float)gameTime.TotalGameTime.TotalSeconds;
+                }
+
+                for (int i = 0; i < enemyBullets.Count; i++)
+                {
+                    if (enemyBullets[i].BulletLocation.X > 1180 || enemyBullets[i].BulletLocation.X < -100 || enemyBullets[i].BulletLocation.Y > 820 || enemyBullets[i].BulletLocation.Y < -100)
+                        enemyBullets.RemoveAt(i);
+                }
+            }
+            */
             // - hitting enemies
             foreach (EnemyPlane enemy in enemyPlanes)
             {
