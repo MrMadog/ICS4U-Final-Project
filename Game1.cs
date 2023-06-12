@@ -68,7 +68,7 @@ namespace ICS4U_Final_Project
         Vector2 origin, planeLocation, prevPlaneLocation, planeShadowLocation, mousePos, planeDirection, target, coinSpawnCircle, coinPoints;
         Vector2 damagePoints;
 
-        Circle mouseCircle, targetCircle, coinCircle;
+        Circle mouseCircle, targetCircle, coinCircle, userHitbox;
 
         Color colour;
 
@@ -78,9 +78,10 @@ namespace ICS4U_Final_Project
         bool done = false;
         bool fadeBool = false;
         bool bulletBool = false;
-        bool hitBool = false;
+        bool enemyHitBool = false;
         bool userHit = false;
         bool explosion = false;
+        bool randomBool = false;
 
         SpriteFont pointsFont, pointNumbers, followingFont, upgradeMenuFont, upgradeMenuInfoFont, currentFont, availablePointsFont, menuTitleFont;
 
@@ -237,10 +238,13 @@ namespace ICS4U_Final_Project
             mouse = new Point(mouseState.X, mouseState.Y);
             mousePos = new Vector2(mouseState.X, mouseState.Y);
 
+            userPlane = userPlaneTexture1;
+
             coinSpawnCircle = new Vector2(coinSpawnX + coinRect.Width / 2, coinSpawnY + coinRect.Height / 2);
 
             mouseCircle = new Circle(mousePos, 10);
             coinCircle = new Circle(coinSpawnCircle, 30);
+            userHitbox = new Circle(planeLocation, userPlane.Width / 2);
 
             seconds = (float)gameTime.TotalGameTime.TotalSeconds - startTime;
 
@@ -253,8 +257,6 @@ namespace ICS4U_Final_Project
                 buttons[i].Update();
 
             buttonHover = false;
-
-            userPlane = userPlaneTexture1;
 
             if (screen == Screen.Intro)
                 IntroScreenUpdate(gameTime);
@@ -439,15 +441,12 @@ namespace ICS4U_Final_Project
                 }
             }
             for (int i = 0; i < bullets.Count; i++)
-            {
                 if (bullets[i].BulletLocation.X > 1180 || bullets[i].BulletLocation.X < -100 || bullets[i].BulletLocation.Y > 820 || bullets[i].BulletLocation.Y < -100)
                     bullets.RemoveAt(i);
-            }
+
             if (bulletBool)
-            {
                 foreach (Bullet bullet in bullets)
                     bullet.Update();
-            }
 
             // - enemies
             if (seconds2 >= 5)
@@ -458,30 +457,21 @@ namespace ICS4U_Final_Project
                 startTime2 = (float)gameTime.TotalGameTime.TotalSeconds;
                 startTime5 = (float)gameTime.TotalGameTime.TotalSeconds;
             }
-            // ---------------------------------------- where i left off -------------------------------------------------------------------------------
-            /*
+            
+            // - enemy bullets hitting me
             foreach (EnemyPlane enemy in enemyPlanes)
             {
-                if (seconds5 >= 3)
+                for (int i = 0; i < enemy.GetBulletCount; i++)
                 {
-                    enemyBullets.Add(new Bullet(bulletTexture, enemy.GetBulletLocation, enemy.GetTarget, 3, planeShot));
-                    startTime5 = (float)gameTime.TotalGameTime.TotalSeconds;
-                }
-
-                if (seconds6 >= 3.5)
-                {
-                    enemyBullets.Add(new Bullet(bulletTexture, enemy.GetBulletLocation, enemy.GetTarget, 3, planeShot));
-                    startTime6 = (float)gameTime.TotalGameTime.TotalSeconds;
-                    startTime5 = (float)gameTime.TotalGameTime.TotalSeconds;
-                }
-
-                for (int i = 0; i < enemyBullets.Count; i++)
-                {
-                    if (enemyBullets[i].BulletLocation.X > 1180 || enemyBullets[i].BulletLocation.X < -100 || enemyBullets[i].BulletLocation.Y > 820 || enemyBullets[i].BulletLocation.Y < -100)
-                        enemyBullets.RemoveAt(i);
+                    if (userHitbox.Contains(enemy[i]))
+                    {
+                        randomBool = true;
+                        enemy.HitIndex = i;
+                        planeHealth -= 25;
+                    }
                 }
             }
-            */
+           
             // - hitting enemies
             foreach (EnemyPlane enemy in enemyPlanes)
             {
@@ -489,7 +479,7 @@ namespace ICS4U_Final_Project
                 {
                     if (enemy.Contains(bullets[i].BulletLocation))
                     {
-                        hitBool = true;
+                        enemyHitBool = true;
                         bullets.RemoveAt(i);
                         startTime4 = (float)gameTime.TotalGameTime.TotalSeconds;
                         damagePoints = enemy.GetLocation;
@@ -498,27 +488,35 @@ namespace ICS4U_Final_Project
                 }
             }
 
+            // - killing enemies
             for (int i = 0; i < enemyPlanes.Count; i++)
                 if (enemyPlanes[i].planeHealth <= 0)
+                {
                     enemyPlanes.RemoveAt(i);
+                    points += 50;
+                }
 
+            // - updating enemies and bullets
             foreach (EnemyPlane plane in enemyPlanes)
                 plane.Update(gameTime);
 
             foreach (Bullet enemyBullet in enemyBullets)
-            {
                 enemyBullet.Update();
+
+            // - game over(health = 0)
+            if (planeHealth <= 0)
+            {
+                screen = Screen.Outro;
             }
 
-
+            // - random testing
             if (keyboardState.IsKeyDown(Keys.RightShift) && prevKeyboardState.IsKeyUp(Keys.RightShift))
             {
                 explosion = true;
                 startTime5 = (float)gameTime.TotalGameTime.TotalSeconds;
             }
 
-
-
+            // - ending game
             if (keyboardState.IsKeyDown(Keys.RightControl) && prevKeyboardState.IsKeyUp(Keys.RightControl))
             {
                 screen = Screen.Outro;
@@ -655,6 +653,9 @@ namespace ICS4U_Final_Project
             // - plane ammo
             _spriteBatch.DrawString(followingFont, $"Ammo: {planeAmmo}", new Vector2(40, 250), Color.White);
 
+            if (randomBool)
+                _spriteBatch.DrawString(pointsFont, "BDIASYGUGHSF", new Vector2(300, 300), Color.White);
+
 
 
             if (userHit)
@@ -667,8 +668,8 @@ namespace ICS4U_Final_Project
             }
 
             // - hitting enemies
-            if (seconds4 < 3 && hitBool == true)
-                _spriteBatch.DrawString(pointNumbers, "+100", damagePoints, Color.White);
+            if (seconds4 < 3 && enemyHitBool == true)
+                _spriteBatch.DrawString(pointNumbers, "50", damagePoints, Color.DarkRed);
 
             // - cursor
             if (buttonHover == true)

@@ -12,6 +12,7 @@ namespace ICS4U_Final_Project
         private int _level;
         private int _speed;
         private int _planeHealth;
+        private int _hitIndex;
         private Texture2D _planeTexture;
         private Texture2D _bulletTexture;
         private Vector2 _location;
@@ -25,6 +26,7 @@ namespace ICS4U_Final_Project
         private List<Bullet> enemyBullets = new List<Bullet>();
         private bool bulletBool = false;
         private bool bulletBool2 = false;
+        private bool hitBool = false;
         private SoundEffect _bulletSound;
 
         public EnemyPlane(Texture2D planeTexture, Texture2D bulletTexture, int level, SoundEffect bulletSound, GameTime gameTime)
@@ -80,9 +82,20 @@ namespace ICS4U_Final_Project
             get { return _location; }
         }
 
-        public Vector2 GetBulletLocation
+        public int GetBulletCount
         {
-            get { return _bulletLocation; }
+            get { return enemyBullets.Count; }
+        }
+
+        public Vector2 this[int index]
+        {
+            get { return enemyBullets[index].BulletLocation; }
+        }
+
+        public int HitIndex
+        {
+            get { return _hitIndex; }
+            set { _hitIndex = value; hitBool = true; }
         }
 
         public Vector2 GetTarget
@@ -141,7 +154,11 @@ namespace ICS4U_Final_Project
                     enemyBullets.RemoveAt(i);
             }
 
-
+            if (hitBool)
+            {
+                enemyBullets.RemoveAt(HitIndex);
+                hitBool = false;
+            }
 
             foreach (Bullet bullet in enemyBullets)
                 bullet.Update();
