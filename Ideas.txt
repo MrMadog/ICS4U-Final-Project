@@ -20,6 +20,7 @@
 		- maybe a new class where it randomly picks a start and end position for the enemy planes
 		- press escape during gameplay
 			- pause game and have a quit, resume, restart, options
+		- make plane smoke darker as you lose health
 
 
 	Enemy Ideas:

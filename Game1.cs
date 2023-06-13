@@ -79,9 +79,9 @@ namespace ICS4U_Final_Project
         bool fadeBool = false;
         bool bulletBool = false;
         bool enemyHitBool = false;
-        bool userHit = false;
         bool explosion = false;
-        bool randomBool = false;
+        bool userHit = false;
+        bool crashBool = false;
 
         SpriteFont pointsFont, pointNumbers, followingFont, upgradeMenuFont, upgradeMenuInfoFont, currentFont, availablePointsFont, menuTitleFont;
 
@@ -252,9 +252,6 @@ namespace ICS4U_Final_Project
             cursorRect.Y = mouseState.Y - 16;
             cursorHoverRect.X = mouseState.X - 14;
             cursorHoverRect.Y = mouseState.Y - 14;
-
-            for (int i = 0; i < 8; i++)
-                buttons[i].Update();
 
             buttonHover = false;
 
@@ -465,14 +462,14 @@ namespace ICS4U_Final_Project
                 {
                     if (userHitbox.Contains(enemy[i]))
                     {
-                        randomBool = true;
+                        userHit = true;
                         enemy.HitIndex = i;
                         planeHealth -= 25;
                     }
                 }
             }
            
-            // - hitting enemies
+            // - user bullets hitting enemies
             foreach (EnemyPlane enemy in enemyPlanes)
             {
                 for (int i = 0; i < bullets.Count; i++)
@@ -487,6 +484,16 @@ namespace ICS4U_Final_Project
                     }
                 }
             }
+
+            for (int i = 0; i < enemyPlanes.Count; i++)
+            {
+                if (enemyPlanes[i].Intersects(userHitbox))
+                {
+                    crashBool = true;
+                    enemyPlanes.RemoveAt(i);
+                }
+            }
+
 
             // - killing enemies
             for (int i = 0; i < enemyPlanes.Count; i++)
@@ -582,6 +589,9 @@ namespace ICS4U_Final_Project
 
             }
 
+            for (int i = 0; i < 8; i++)
+                buttons[i].Update();
+
             if (keyboardState.IsKeyUp(Keys.Tab))
                 screen = Screen.Game;
         }
@@ -653,13 +663,15 @@ namespace ICS4U_Final_Project
             // - plane ammo
             _spriteBatch.DrawString(followingFont, $"Ammo: {planeAmmo}", new Vector2(40, 250), Color.White);
 
-            if (randomBool)
-                _spriteBatch.DrawString(pointsFont, "BDIASYGUGHSF", new Vector2(300, 300), Color.White);
 
 
 
             if (userHit)
-                _spriteBatch.DrawString(followingFont, "HIT", new Vector2(40, 300), Color.White);
+                _spriteBatch.DrawString(pointsFont, "", new Vector2(300, 300), Color.White);
+
+
+            if (crashBool)
+                _spriteBatch.DrawString(pointsFont, "BOOOOOOOOOOM", new Vector2(200, 400), Color.White);
 
 
             foreach (Bullet enemyBullet in enemyBullets)

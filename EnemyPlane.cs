@@ -77,6 +77,11 @@ namespace ICS4U_Final_Project
             return _planeHitbox.Contains(point);
         }
 
+        public bool Intersects(Circle user)
+        {
+            return _planeHitbox.Intersects(user);
+        }
+
         public Vector2 GetLocation
         {
             get { return _location; }
@@ -122,7 +127,9 @@ namespace ICS4U_Final_Project
 
             _bulletLocation.X += _velocity.X;
             _bulletLocation.Y += _velocity.Y;
-            
+
+            _planeHitbox.Center = _location;
+
             if (seconds >= 0 && bulletBool == false)
             {
                 enemyBullets.Add(new Bullet(_bulletTexture, _bulletLocation, _target, 3, _bulletSound));
@@ -162,8 +169,6 @@ namespace ICS4U_Final_Project
 
             foreach (Bullet bullet in enemyBullets)
                 bullet.Update();
-
-            _planeHitbox.Center = _location;
         }
         public void Draw(SpriteBatch _spriteBatch)
         {
@@ -171,7 +176,7 @@ namespace ICS4U_Final_Project
                 bullet.Draw(_spriteBatch);
 
             _spriteBatch.Draw(_planeTexture, _location, null, Color.White, _rotation, _rotationOrigin, 1f, SpriteEffects.None, 0f);    // enemy plane
-            _spriteBatch.Draw(_planeTexture, _shadowLocation, null, Color.Black * 0.4f, _rotation, _rotationOrigin, 1f, SpriteEffects.None, 0f);    // enemy plane shadow
+            _spriteBatch.Draw(_planeTexture, _shadowLocation, null, Color.Black * 0.4f, _rotation, _rotationOrigin, 1f, SpriteEffects.None, 0f);    // enemy plane shadow        
         }
     }
 }
