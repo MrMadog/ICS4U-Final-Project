@@ -27,6 +27,7 @@ namespace ICS4U_Final_Project
         private bool bulletBool = false;
         private bool bulletBool2 = false;
         private bool hitBool = false;
+        private bool drawBool = true;
         private SoundEffect _bulletSound;
 
         public EnemyPlane(Texture2D planeTexture, Texture2D bulletTexture, int level, SoundEffect bulletSound, GameTime gameTime)
@@ -77,11 +78,6 @@ namespace ICS4U_Final_Project
             return _planeHitbox.Contains(point);
         }
 
-        public bool Intersects(Circle user)
-        {
-            return _planeHitbox.Intersects(user);
-        }
-
         public Vector2 GetLocation
         {
             get { return _location; }
@@ -108,6 +104,12 @@ namespace ICS4U_Final_Project
             get { return _target; }
         }
 
+        public bool DrawBool
+        {
+            get { return drawBool; }
+            set { drawBool = value; }
+        }
+
         public int planeHealth
         {
             get { return _planeHealth; }
@@ -130,25 +132,25 @@ namespace ICS4U_Final_Project
 
             _planeHitbox.Center = _location;
 
-            if (seconds >= 0 && bulletBool == false)
+            if (seconds >= 0 && bulletBool == false && drawBool == true)
             {
                 enemyBullets.Add(new Bullet(_bulletTexture, _bulletLocation, _target, 3, _bulletSound));
                 bulletBool = true;
             }
 
-            if (seconds2 >= 0.5 && bulletBool2 == false)
+            if (seconds2 >= 0.5 && bulletBool2 == false && drawBool == true)
             {
                 enemyBullets.Add(new Bullet(_bulletTexture, _bulletLocation, _target, 3, _bulletSound));
                 bulletBool2 = true;
             }
 
-            if (seconds >= 3)
+            if (seconds >= 3 && drawBool == true)
             {
                 enemyBullets.Add(new Bullet(_bulletTexture, _bulletLocation, _target, 3, _bulletSound));
                 startTime = (float)gameTime.TotalGameTime.TotalSeconds;
             }
 
-            if (seconds2 >= 3.5)
+            if (seconds2 >= 3.5 && drawBool == true)
             {
                 enemyBullets.Add(new Bullet(_bulletTexture, _bulletLocation, _target, 3, _bulletSound));
                 startTime = (float)gameTime.TotalGameTime.TotalSeconds;
@@ -175,8 +177,11 @@ namespace ICS4U_Final_Project
             foreach (Bullet bullet in enemyBullets)
                 bullet.Draw(_spriteBatch);
 
-            _spriteBatch.Draw(_planeTexture, _location, null, Color.White, _rotation, _rotationOrigin, 1f, SpriteEffects.None, 0f);    // enemy plane
-            _spriteBatch.Draw(_planeTexture, _shadowLocation, null, Color.Black * 0.4f, _rotation, _rotationOrigin, 1f, SpriteEffects.None, 0f);    // enemy plane shadow        
+            if (drawBool)
+            {
+                _spriteBatch.Draw(_planeTexture, _location, null, Color.White, _rotation, _rotationOrigin, 1f, SpriteEffects.None, 0f);    // enemy plane
+                _spriteBatch.Draw(_planeTexture, _shadowLocation, null, Color.Black * 0.4f, _rotation, _rotationOrigin, 1f, SpriteEffects.None, 0f);    // enemy plane shadow        
+            }
         }
     }
 }

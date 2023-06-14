@@ -424,8 +424,6 @@ namespace ICS4U_Final_Project
                 }
                 startTime3 = (float)gameTime.TotalGameTime.TotalSeconds;
             }
-            foreach (Trail PlaneTrail in planeTrail)
-                PlaneTrail.Update();
 
             // - bullets
             if (keyboardState.IsKeyDown(Keys.Space) && prevKeyboardState.IsKeyUp(Keys.Space))
@@ -485,15 +483,16 @@ namespace ICS4U_Final_Project
                 }
             }
 
+            // - crashing into enemies
             for (int i = 0; i < enemyPlanes.Count; i++)
             {
-                if (enemyPlanes[i].Intersects(userHitbox))
+                if (enemyPlanes[i].Contains(planeLocation))
                 {
                     crashBool = true;
-                    enemyPlanes.RemoveAt(i);
+                    enemyPlanes[i].DrawBool = false;
+                    planeHealth -= 75;
                 }
             }
-
 
             // - killing enemies
             for (int i = 0; i < enemyPlanes.Count; i++)
@@ -503,12 +502,15 @@ namespace ICS4U_Final_Project
                     points += 50;
                 }
 
-            // - updating enemies and bullets
+            // - updating enemies and bullets and trail
             foreach (EnemyPlane plane in enemyPlanes)
                 plane.Update(gameTime);
 
             foreach (Bullet enemyBullet in enemyBullets)
                 enemyBullet.Update();
+
+            foreach (Trail PlaneTrail in planeTrail)
+                PlaneTrail.Update();
 
             // - game over(health = 0)
             if (planeHealth <= 0)
