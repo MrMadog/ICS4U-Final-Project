@@ -4,6 +4,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading;
 
 namespace ICS4U_Final_Project
 {
@@ -26,7 +28,6 @@ namespace ICS4U_Final_Project
 
         List<Button> buttons;
         List<Bullet> bullets;
-        List<Bullet> enemyBullets;
         List<Trail> planeTrail;
         List<EnemyPlane> enemyPlanes;
         List<Texture2D> userPlaneTextures;
@@ -72,6 +73,9 @@ namespace ICS4U_Final_Project
 
         Color colour;
 
+        Stopwatch timer;
+        TimeSpan seconds10;
+
         bool targetBool = false;
         bool coinPointsBool = false;
         bool buttonHover = false;
@@ -104,7 +108,6 @@ namespace ICS4U_Final_Project
 
             buttons = new List<Button>();
             bullets = new List<Bullet>();
-            enemyBullets = new List<Bullet>();
             planeTrail = new List<Trail>();
             enemyPlanes = new List<EnemyPlane>();
             userPlaneTextures = new List<Texture2D>();
@@ -135,6 +138,8 @@ namespace ICS4U_Final_Project
             colour = new Color(0, 0, 0, 0);
 
             i = 0;
+
+            timer = new Stopwatch();
 
             base.Initialize();
 
@@ -316,6 +321,12 @@ namespace ICS4U_Final_Project
         }
         public void GameScreenUpdate(GameTime gameTime)
         {
+            timer.Start();
+
+            seconds10 = timer.Elapsed;
+
+            if (seconds10.TotalSeconds >= 5)
+                timer.Stop();
             seconds2 = (float)gameTime.TotalGameTime.TotalSeconds - startTime2;
             seconds3 = (float)gameTime.TotalGameTime.TotalSeconds - startTime3;
             seconds4 = (float)gameTime.TotalGameTime.TotalSeconds - startTime4;
@@ -458,7 +469,7 @@ namespace ICS4U_Final_Project
             {
                 for (int i = 0; i < enemy.GetBulletCount; i++)
                 {
-                    if (userHitbox.Contains(enemy[i]))
+                    if (userHitbox.Contains(enemy[i]) && !enemy.Contains(planeLocation))
                     {
                         userHit = true;
                         enemy.HitIndex = i;
@@ -484,13 +495,15 @@ namespace ICS4U_Final_Project
             }
 
             // - crashing into enemies
-            for (int i = 0; i < enemyPlanes.Count; i++)
+            foreach (EnemyPlane enemy in enemyPlanes)
             {
-                if (enemyPlanes[i].Contains(planeLocation))
+                if (enemy.Contains(planeLocation))
                 {
                     crashBool = true;
-                    enemyPlanes[i].DrawBool = false;
+                    enemyPlanes.Remove(enemy);
+                    //enemy.DrawBool = false;
                     planeHealth -= 75;
+                    break;
                 }
             }
 
@@ -505,9 +518,6 @@ namespace ICS4U_Final_Project
             // - updating enemies and bullets and trail
             foreach (EnemyPlane plane in enemyPlanes)
                 plane.Update(gameTime);
-
-            foreach (Bullet enemyBullet in enemyBullets)
-                enemyBullet.Update();
 
             foreach (Trail PlaneTrail in planeTrail)
                 PlaneTrail.Update();
@@ -668,18 +678,14 @@ namespace ICS4U_Final_Project
 
 
 
+            // - Testing area -------------------------------------------------------------------------------------------
+
             if (userHit)
                 _spriteBatch.DrawString(pointsFont, "", new Vector2(300, 300), Color.White);
 
 
             if (crashBool)
                 _spriteBatch.DrawString(pointsFont, "BOOOOOOOOOOM", new Vector2(200, 400), Color.White);
-
-
-            foreach (Bullet enemyBullet in enemyBullets)
-            {
-                enemyBullet.Draw(_spriteBatch);
-            }
 
             // - hitting enemies
             if (seconds4 < 3 && enemyHitBool == true)

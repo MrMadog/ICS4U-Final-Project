@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace ICS4U_Final_Project
 {
@@ -22,13 +23,15 @@ namespace ICS4U_Final_Project
         private Vector2 _rotationOrigin;
         private Vector2 _target;
         private Circle _planeHitbox;
-        private float _rotation, seconds, startTime, seconds2, startTime2;
+        private float _rotation;
         private List<Bullet> enemyBullets = new List<Bullet>();
         private bool bulletBool = false;
         private bool bulletBool2 = false;
         private bool hitBool = false;
         private bool drawBool = true;
         private SoundEffect _bulletSound;
+        private Stopwatch timer, timer2;
+        private TimeSpan elapsed, elapsed2;
 
         public EnemyPlane(Texture2D planeTexture, Texture2D bulletTexture, int level, SoundEffect bulletSound, GameTime gameTime)
         {
@@ -45,8 +48,8 @@ namespace ICS4U_Final_Project
 
             _target = new Vector2(1280, generator.Next(0, 720));
 
-            startTime = (float)gameTime.TotalGameTime.TotalSeconds;
-            startTime2 = (float)gameTime.TotalGameTime.TotalSeconds;
+            timer = new Stopwatch();
+            timer2 = new Stopwatch();
 
             switch (_level)
             {
@@ -116,10 +119,18 @@ namespace ICS4U_Final_Project
             set { _planeHealth = value; }
         }
 
+        public double timer1
+        {
+            get { return Math.Round(elapsed.TotalSeconds); }
+        }
+
         public void Update(GameTime gameTime)
         {
-            seconds = (float)gameTime.TotalGameTime.TotalSeconds - startTime;
-            seconds2 = (float)gameTime.TotalGameTime.TotalSeconds - startTime2;
+            timer.Start();
+            timer2.Start();
+
+            elapsed = timer.Elapsed;
+            elapsed2 = timer2.Elapsed;
 
             _location.X += _velocity.X;
             _location.Y += _velocity.Y;
@@ -132,29 +143,29 @@ namespace ICS4U_Final_Project
 
             _planeHitbox.Center = _location;
 
-            if (seconds >= 0 && bulletBool == false && drawBool == true)
+            if (elapsed.TotalSeconds >= 0 && bulletBool == false && drawBool == true)
             {
                 enemyBullets.Add(new Bullet(_bulletTexture, _bulletLocation, _target, 3, _bulletSound));
                 bulletBool = true;
             }
 
-            if (seconds2 >= 0.5 && bulletBool2 == false && drawBool == true)
+            if (elapsed2.TotalSeconds >= 0.5 && bulletBool2 == false && drawBool == true)
             {
                 enemyBullets.Add(new Bullet(_bulletTexture, _bulletLocation, _target, 3, _bulletSound));
                 bulletBool2 = true;
             }
 
-            if (seconds >= 3 && drawBool == true)
+            if (elapsed.TotalSeconds >= 3 && drawBool == true)
             {
                 enemyBullets.Add(new Bullet(_bulletTexture, _bulletLocation, _target, 3, _bulletSound));
-                startTime = (float)gameTime.TotalGameTime.TotalSeconds;
+                timer.Stop();
             }
 
-            if (seconds2 >= 3.5 && drawBool == true)
+            if (elapsed2.TotalSeconds >= 3.5 && drawBool == true)
             {
                 enemyBullets.Add(new Bullet(_bulletTexture, _bulletLocation, _target, 3, _bulletSound));
-                startTime = (float)gameTime.TotalGameTime.TotalSeconds;
-                startTime2 = (float)gameTime.TotalGameTime.TotalSeconds;
+                timer.Restart();
+                timer2.Restart();
             }
 
             for (int i = 0; i < enemyBullets.Count; i++)
