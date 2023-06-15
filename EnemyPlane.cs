@@ -119,9 +119,15 @@ namespace ICS4U_Final_Project
             set { _planeHealth = value; }
         }
 
-        public double timer1
+        public Stopwatch enemyTimer
         {
-            get { return Math.Round(elapsed.TotalSeconds); }
+            get { return timer; }
+            set { timer = value; }
+        }
+        public Stopwatch enemyTimer2
+        {
+            get { return timer2; }
+            set { timer2 = value; }
         }
 
         public void Update(GameTime gameTime)
@@ -158,7 +164,7 @@ namespace ICS4U_Final_Project
             if (elapsed.TotalSeconds >= 3 && drawBool == true)
             {
                 enemyBullets.Add(new Bullet(_bulletTexture, _bulletLocation, _target, 3, _bulletSound));
-                timer.Stop();
+                timer.Restart();
             }
 
             if (elapsed2.TotalSeconds >= 3.5 && drawBool == true)

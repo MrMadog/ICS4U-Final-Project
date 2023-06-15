@@ -51,8 +51,7 @@ namespace ICS4U_Final_Project
         MouseState mouseState, prevMouseState;
         KeyboardState keyboardState, prevKeyboardState;
 
-        float angle, prevAngle, seconds, startTime, seconds2, startTime2, seconds3, startTime3, seconds4, startTime4, seconds5, startTime5;
-        float seconds6, startTime6;
+        float angle, prevAngle;
 
         Point mouse;
 
@@ -67,17 +66,18 @@ namespace ICS4U_Final_Project
         Screen screen;
 
         Vector2 origin, planeLocation, prevPlaneLocation, planeShadowLocation, mousePos, planeDirection, target, coinSpawnCircle, coinPoints;
-        Vector2 damagePoints;
+        Vector2 damagePoints, killPoints;
 
         Circle mouseCircle, targetCircle, coinCircle, userHitbox;
 
         Color colour;
 
-        Stopwatch timer;
-        TimeSpan seconds10;
+        Stopwatch timer, timer2, timer3, timer4, timer5, timer6;
+        TimeSpan elapsed, elapsed2, elapsed3, elapsed4, elapsed5, elapsed6;
 
         bool targetBool = false;
         bool coinPointsBool = false;
+        bool enemyKillBool = false;
         bool buttonHover = false;
         bool done = false;
         bool fadeBool = false;
@@ -89,7 +89,7 @@ namespace ICS4U_Final_Project
 
         SpriteFont pointsFont, pointNumbers, followingFont, upgradeMenuFont, upgradeMenuInfoFont, currentFont, availablePointsFont, menuTitleFont;
 
-        SoundEffect planeShot;
+        SoundEffect planeShot, enemyPlaneShot;
 
         public Game1()
         {
@@ -140,6 +140,11 @@ namespace ICS4U_Final_Project
             i = 0;
 
             timer = new Stopwatch();
+            timer2 = new Stopwatch();
+            timer3 = new Stopwatch();
+            timer4 = new Stopwatch();
+            timer5 = new Stopwatch();
+            timer6 = new Stopwatch();
 
             base.Initialize();
 
@@ -230,7 +235,8 @@ namespace ICS4U_Final_Project
             menuTitleFont = Content.Load<SpriteFont>("Menu Title Font");
 
             // - sounds
-            planeShot = Content.Load<SoundEffect>("plane shot");
+            planeShot = Content.Load<SoundEffect>("planeShot");
+            enemyPlaneShot = Content.Load<SoundEffect>("enemyPlaneShot");
         }
 
         protected override void Update(GameTime gameTime)
@@ -251,7 +257,7 @@ namespace ICS4U_Final_Project
             coinCircle = new Circle(coinSpawnCircle, 30);
             userHitbox = new Circle(planeLocation, userPlane.Width / 2);
 
-            seconds = (float)gameTime.TotalGameTime.TotalSeconds - startTime;
+            timer.Start(); elapsed = timer.Elapsed;
 
             cursorRect.X = mouseState.X - 16;
             cursorRect.Y = mouseState.Y - 16;
@@ -321,17 +327,11 @@ namespace ICS4U_Final_Project
         }
         public void GameScreenUpdate(GameTime gameTime)
         {
-            timer.Start();
-
-            seconds10 = timer.Elapsed;
-
-            if (seconds10.TotalSeconds >= 5)
-                timer.Stop();
-            seconds2 = (float)gameTime.TotalGameTime.TotalSeconds - startTime2;
-            seconds3 = (float)gameTime.TotalGameTime.TotalSeconds - startTime3;
-            seconds4 = (float)gameTime.TotalGameTime.TotalSeconds - startTime4;
-            seconds5 = (float)gameTime.TotalGameTime.TotalSeconds - startTime5;
-            seconds6 = (float)gameTime.TotalGameTime.TotalSeconds - startTime6;
+            timer2.Start(); elapsed2 = timer2.Elapsed;
+            timer3.Start(); elapsed3 = timer3.Elapsed;
+            timer4.Start(); elapsed4 = timer4.Elapsed;
+            timer5.Start(); elapsed5 = timer5.Elapsed;
+            timer6.Start(); elapsed6 = timer6.Elapsed;
 
             // - checking if mouse is in screen when target is attempted to be created
             if (mousePos.X > 0 && mousePos.X < 1080 && mousePos.Y > 0 && mousePos.Y < 720)
@@ -415,17 +415,17 @@ namespace ICS4U_Final_Project
 
                 points += 100;
                 totalPoints += 100;
-                startTime = (float)gameTime.TotalGameTime.TotalSeconds;
+                timer.Restart();
                 coinPointsBool = true;
             }
 
             // - plane shadow and trail
             planeShadowLocation = new Vector2(planeLocation.X - 30, planeLocation.Y + 75);
 
-            if (seconds3 >= 0.4)
+            if (elapsed3.TotalSeconds >= 0.4)
             {
                 if (planeTrail.Count < 12)
-                    planeTrail.Add(new Trail(planeTrailTexture, planeLocation));
+                    planeTrail.Add(new Trail(planeTrailTexture, planeLocation, Color.Black));
                 for (int i = 0; i < planeTrail.Count; i++)
                 {
                     if (planeTrail[i].getAlpha <= 0f)
@@ -433,7 +433,7 @@ namespace ICS4U_Final_Project
                         planeTrail.RemoveAt(i);
                     }
                 }
-                startTime3 = (float)gameTime.TotalGameTime.TotalSeconds;
+                timer3.Restart();
             }
 
             // - bullets
@@ -442,7 +442,10 @@ namespace ICS4U_Final_Project
                 bulletBool = true;
                 if (planeAmmo > 0)
                 {
-                    bullets.Add(new Bullet(bulletTexture, planeLocation, mouseState.Position.ToVector2(), 3, planeShot));
+                    if (targetBool)
+                        bullets.Add(new Bullet(bulletTexture, planeLocation, target, 3, planeShot));
+                    else 
+                        bullets.Add(new Bullet(bulletTexture, planeLocation, mouseState.Position.ToVector2(), 3, planeShot));
                     planeAmmo -= 1;
                 }
             }
@@ -455,13 +458,12 @@ namespace ICS4U_Final_Project
                     bullet.Update();
 
             // - enemies
-            if (seconds2 >= 5)
+            if (elapsed2.TotalSeconds >= 5)
             {
                 enemyPlane = enemyPlaneTextures[generator.Next(0, enemyPlaneTextures.Count)];
 
-                enemyPlanes.Add(new EnemyPlane(enemyPlane, bulletTexture, 2, planeShot, gameTime));
-                startTime2 = (float)gameTime.TotalGameTime.TotalSeconds;
-                startTime5 = (float)gameTime.TotalGameTime.TotalSeconds;
+                enemyPlanes.Add(new EnemyPlane(enemyPlane, bulletTexture, 2, enemyPlaneShot, gameTime));
+                timer2.Restart();
             }
             
             // - enemy bullets hitting me
@@ -487,8 +489,8 @@ namespace ICS4U_Final_Project
                     {
                         enemyHitBool = true;
                         bullets.RemoveAt(i);
-                        startTime4 = (float)gameTime.TotalGameTime.TotalSeconds;
-                        damagePoints = enemy.GetLocation;
+                        timer4.Restart();
+                        damagePoints = new Vector2(enemy.GetLocation.X + 20, enemy.GetLocation.Y + 30);
                         enemy.planeHealth -= 50;
                     }
                 }
@@ -501,19 +503,43 @@ namespace ICS4U_Final_Project
                 {
                     crashBool = true;
                     enemyPlanes.Remove(enemy);
-                    //enemy.DrawBool = false;
                     planeHealth -= 75;
                     break;
                 }
             }
 
+            // - deleting enemies off screen
+            for (int i = 0; i < enemyPlanes.Count; i++)
+            {
+                if (enemyPlanes[i].GetLocation.X > 1180 || enemyPlanes[i].GetLocation.X < -100 || enemyPlanes[i].GetLocation.Y > 820 || enemyPlanes[i].GetLocation.Y < -100)
+                    enemyPlanes.RemoveAt(i);
+            }
+
             // - killing enemies
             for (int i = 0; i < enemyPlanes.Count; i++)
+            {
                 if (enemyPlanes[i].planeHealth <= 0)
                 {
+                    killPoints = new Vector2(enemyPlanes[i].GetLocation.X - 40, enemyPlanes[i].GetLocation.Y - 20);
                     enemyPlanes.RemoveAt(i);
-                    points += 50;
+                    points += 250;
+                    timer4.Restart();
+                    enemyKillBool = true;
                 }
+            }
+
+            // - plane trail and health correlation
+            foreach (Trail circle in planeTrail)
+            {
+                if (planeHealth > totalPlaneHealth * 0.75)
+                    circle.SetColor = Color.White;
+                if (planeHealth > totalPlaneHealth * 0.50 && planeHealth <= totalPlaneHealth * 0.75)
+                    circle.SetColor = Color.LightGray;
+                if (planeHealth > totalPlaneHealth * 0.25 && planeHealth <= totalPlaneHealth * 0.50)
+                    circle.SetColor = Color.Gray;
+                if (planeHealth <= totalPlaneHealth * 0.25)
+                    circle.SetColor = Color.Black;
+            }
 
             // - updating enemies and bullets and trail
             foreach (EnemyPlane plane in enemyPlanes)
@@ -532,7 +558,7 @@ namespace ICS4U_Final_Project
             if (keyboardState.IsKeyDown(Keys.RightShift) && prevKeyboardState.IsKeyUp(Keys.RightShift))
             {
                 explosion = true;
-                startTime5 = (float)gameTime.TotalGameTime.TotalSeconds;
+                timer5.Restart();
             }
 
             // - ending game
@@ -543,6 +569,12 @@ namespace ICS4U_Final_Project
         }
         public void UpgradeScreenUpdate(GameTime gametime)
         {
+            foreach (EnemyPlane enemy in enemyPlanes)
+            {
+                enemy.enemyTimer.Stop();
+                enemy.enemyTimer2.Stop();
+            }
+
             for (int i = 0; i < 8; i++)
             {
                 if (buttons[i].IsHovering(mouse))
@@ -605,8 +637,16 @@ namespace ICS4U_Final_Project
                 buttons[i].Update();
 
             if (keyboardState.IsKeyUp(Keys.Tab))
+            {
+                foreach (EnemyPlane enemy in enemyPlanes)
+                {
+                    enemy.enemyTimer.Start();
+                    enemy.enemyTimer2.Start();
+                }
                 screen = Screen.Game;
+            }
         }
+
         public void OutroScreenUpdate(GameTime gameTime)
         {
 
@@ -657,8 +697,10 @@ namespace ICS4U_Final_Project
             _spriteBatch.DrawString(pointsFont, $"Points :  {points}", new Vector2(40, 40), Color.Black);
 
             // - points numbers
-            if (seconds < 3 && coinPointsBool == true)
+            if (elapsed.TotalSeconds < 3 && coinPointsBool == true)
                 _spriteBatch.DrawString(pointNumbers, "+100", coinPoints, Color.White);
+            if (elapsed4.TotalSeconds < 3 && enemyKillBool == true)
+                _spriteBatch.DrawString(pointNumbers, "+250", killPoints, Color.White);
 
             // - boost amount
             _spriteBatch.DrawString(followingFont, $"Boost: {boostAmount}", new Vector2(40, 100), Color.White);
@@ -683,12 +725,15 @@ namespace ICS4U_Final_Project
             if (userHit)
                 _spriteBatch.DrawString(pointsFont, "", new Vector2(300, 300), Color.White);
 
+            if (enemyPlanes.Count > 0)
+                _spriteBatch.DrawString(followingFont, enemyPlanes.Count.ToString(), new Vector2(40, 300), Color.White);
+
 
             if (crashBool)
                 _spriteBatch.DrawString(pointsFont, "BOOOOOOOOOOM", new Vector2(200, 400), Color.White);
 
             // - hitting enemies
-            if (seconds4 < 3 && enemyHitBool == true)
+            if (elapsed4.TotalSeconds < 2 && enemyHitBool == true)
                 _spriteBatch.DrawString(pointNumbers, "50", damagePoints, Color.DarkRed);
 
             // - cursor

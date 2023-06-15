@@ -21,6 +21,10 @@
 		- press escape during gameplay
 			- pause game and have a quit, resume, restart, options
 		- make plane smoke darker as you lose health
+		- maybe have a screen bounds class
+			- boundries
+			- if .IsOffScreen
+			- use for spawning enemies and making targets
 
 
 	Enemy Ideas:
@@ -51,15 +55,14 @@
 
 
 	Things to do:
-		- Enemies
+		- Enemies(getting there)
 		- Bombs
-		- Ammo (getting there)
 		- Intro and outro screens
 		- Improve UI and add onto button class(sounds)
 		- Figure out binds for everything(pin, shoot, boost)
-		- Pause bullets on menu open (done)
-		- Add sound effects for bullets (done)
 		- Add subtle engine sound effect
+		- Move trail into trail class(adding cirlces to list)
+		- Tell user when they have hit the maximum for any upgrade
 
 
 	https://pixabay.com/sound-effects/search/gunshot/

@@ -123,6 +123,12 @@
 /processorParam:TextureFormat=Color
 /build:enemy plane 6.png
 
+#begin enemyPlaneShot.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:enemyPlaneShot.mp3
+
 #begin following.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
@@ -293,12 +299,6 @@
 /processorParam:TextureFormat=Color
 /build:plane 9.png
 
-#begin plane shot.mp3
-/importer:Mp3Importer
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:plane shot.mp3
-
 #begin planeBullet.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -310,6 +310,12 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:planeBullet.png
+
+#begin planeShot.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:planeShot.mp3
 
 #begin plusbuttonnotpressed.png
 /importer:TextureImporter
