@@ -57,7 +57,7 @@ namespace ICS4U_Final_Project
 
         enum Screen
         {
-            Intro, Game, Outro, Upgrade
+            Intro, Game, Pause, Outro, Upgrade
         }
 
         int coinSpawnX, coinSpawnY, points, totalPoints, i;
@@ -275,6 +275,9 @@ namespace ICS4U_Final_Project
             if (screen == Screen.Upgrade)
                 UpgradeScreenUpdate(gameTime);
 
+            if (screen == Screen.Pause)
+                PauseScreenUpdate(gameTime);
+
             if (screen == Screen.Outro)
                 OutroScreenUpdate(gameTime);
 
@@ -295,6 +298,9 @@ namespace ICS4U_Final_Project
 
             if (screen == Screen.Upgrade)
                 UpgradeScreenDraw(gameTime);
+
+            if (screen == Screen.Pause)
+                PauseScreenDraw(gameTime);
 
             if (screen == Screen.Outro)
                 OutroScreenDraw(gameTime);
@@ -561,18 +567,24 @@ namespace ICS4U_Final_Project
                 timer5.Restart();
             }
 
+            if (keyboardState.IsKeyDown(Keys.Escape) && prevKeyboardState.IsKeyUp(Keys.Escape))
+            {
+                screen = Screen.Pause;
+            }
+
             // - ending game
             if (keyboardState.IsKeyDown(Keys.RightControl) && prevKeyboardState.IsKeyUp(Keys.RightControl))
             {
                 screen = Screen.Outro;
             }
         }
-        public void UpgradeScreenUpdate(GameTime gametime)
+        public void UpgradeScreenUpdate(GameTime gameTime)
         {
             foreach (EnemyPlane enemy in enemyPlanes)
             {
                 enemy.enemyTimer.Stop();
                 enemy.enemyTimer2.Stop();
+                timer2.Stop();
             }
 
             for (int i = 0; i < 8; i++)
@@ -642,11 +654,23 @@ namespace ICS4U_Final_Project
                 {
                     enemy.enemyTimer.Start();
                     enemy.enemyTimer2.Start();
+                    timer2.Start();
                 }
                 screen = Screen.Game;
             }
         }
+        public void PauseScreenUpdate(GameTime gameTime)
+        {
+            foreach (EnemyPlane enemy in enemyPlanes)
+            {
+                enemy.enemyTimer.Stop();
+                enemy.enemyTimer2.Stop();
+                timer2.Stop();
+            }
 
+            if (keyboardState.IsKeyDown(Keys.R) && prevKeyboardState.IsKeyUp(Keys.R))
+                screen = Screen.Game;
+        }
         public void OutroScreenUpdate(GameTime gameTime)
         {
 
@@ -744,7 +768,7 @@ namespace ICS4U_Final_Project
         }
         public void UpgradeScreenDraw(GameTime gameTime)
         {
-            GameScreenDraw(gameTime);
+            //GameScreenDraw(gameTime);
 
             // - dim areas
             _spriteBatch.Draw(dimScreen, dimScreenRect, Color.Black * 0.3f);
@@ -796,6 +820,12 @@ namespace ICS4U_Final_Project
                 _spriteBatch.Draw(cursorTexture, cursorHoverRect, Color.DarkGray);
             else
                 _spriteBatch.Draw(cursorTexture, cursorRect, Color.White);
+        }
+        public void PauseScreenDraw(GameTime gameTime)
+        {
+            GameScreenDraw(gameTime);
+
+            _spriteBatch.Draw(dimScreen, dimScreenRect, Color.Black * 0.3f);
         }
         public void OutroScreenDraw(GameTime gameTime)
         {
