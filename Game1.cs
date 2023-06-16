@@ -33,6 +33,7 @@ namespace ICS4U_Final_Project
         List<Texture2D> userPlaneTextures;
         List<Texture2D> enemyPlaneTextures;
         List<Texture2D> explosionTextures;
+        List<Texture2D> exploSSList; 
 
         Texture2D targetTexture, coinTexture, cursorTexture, bulletTexture, planeTrailTexture;
         Texture2D plusButtonTexture, plusButtonTextureP, minusButtonTexture, minusButtonTextureP, dimScreen;
@@ -43,7 +44,7 @@ namespace ICS4U_Final_Project
         // enemy planes
         Texture2D enemyPlane, enemyPlaneTexture1, enemyPlaneTexture2, enemyPlaneTexture3, enemyPlaneTexture4, enemyPlaneTexture5, enemyPlaneTexture6;
 
-        Texture2D explosionTexture, explo1, explo2, explo3, explo4, explo5;
+        Texture2D exploSpritesheet;
 
         Rectangle targetRect, coinRect, cursorRect, cursorHoverRect;
         Rectangle dimScreenRect, upgradeMenuRect, upgradeMenuInfoRect, upgradeMenuPointsRect;
@@ -52,6 +53,8 @@ namespace ICS4U_Final_Project
         KeyboardState keyboardState, prevKeyboardState;
 
         float angle, prevAngle;
+
+        double ssSpeed;
 
         Point mouse;
 
@@ -113,6 +116,7 @@ namespace ICS4U_Final_Project
             userPlaneTextures = new List<Texture2D>();
             enemyPlaneTextures = new List<Texture2D>();
             explosionTextures = new List<Texture2D>();
+            exploSSList = new List<Texture2D>();
 
             planeLocation = new Vector2(540, 800);
 
@@ -159,15 +163,6 @@ namespace ICS4U_Final_Project
             buttons.Add(new Button(plusButtonTexture, plusButtonTextureP, new Rectangle(590, 400, 36, 36))); // 6
             buttons.Add(new Button(plusButtonTexture, plusButtonTextureP, new Rectangle(590, 480, 36, 36))); // 7
 
-
-            // explosion Textures
-            explosionTextures.Add(explo1);
-            explosionTextures.Add(explo2);
-            explosionTextures.Add(explo3);
-            explosionTextures.Add(explo4);
-            explosionTextures.Add(explo5);
-
-
             // userPlaneTextures.Add();
 
             enemyPlaneTextures.Add(enemyPlaneTexture1);
@@ -193,6 +188,7 @@ namespace ICS4U_Final_Project
             dimScreen = Content.Load<Texture2D>("rectangle");
             bulletTexture = Content.Load<Texture2D>("planeBullet");
             planeTrailTexture = Content.Load<Texture2D>("circle");
+            exploSpritesheet = Content.Load<Texture2D>("explosion_spritesheet");
 
             // - user planes
             userPlaneTexture1 = Content.Load<Texture2D>("plane 1");
@@ -215,14 +211,6 @@ namespace ICS4U_Final_Project
             enemyPlaneTexture6 = Content.Load<Texture2D>("enemy plane 6");
 
 
-            // - explosion Textures
-            explo1 = Content.Load<Texture2D>("tile_0004");
-            explo2 = Content.Load<Texture2D>("tile_0005");
-            explo3 = Content.Load<Texture2D>("tile_0006");
-            explo4 = Content.Load<Texture2D>("tile_0007");
-            explo5 = Content.Load<Texture2D>("tile_0008");
-
-
 
             // - fonts
             pointsFont = Content.Load<SpriteFont>("points");
@@ -237,6 +225,26 @@ namespace ICS4U_Final_Project
             // - sounds
             planeShot = Content.Load<SoundEffect>("planeShot");
             enemyPlaneShot = Content.Load<SoundEffect>("enemyPlaneShot");
+
+            static void SpriteSheet(GraphicsDevice graphicsDevice, Texture2D _texture, List<Texture2D> _textureList, int imageCount)
+            {
+                Texture2D cropTexture;
+                Rectangle sourceRect;
+                int width = _texture.Width / imageCount;
+                int height = _texture.Height;
+
+                for (int x = 0; x < imageCount; x++)
+                {
+                    sourceRect = new Rectangle(x * width, 0, width, height);
+                    cropTexture = new Texture2D(graphicsDevice, width, height);
+                    Color[] data = new Color[width * height];
+                    _texture.GetData(0, sourceRect, data, 0, data.Length);
+                    cropTexture.SetData(data);
+                    _textureList.Add(cropTexture);
+                }
+            }
+
+            SpriteSheet(GraphicsDevice, exploSpritesheet, exploSSList = new List<Texture2D>(), 5);
         }
 
         protected override void Update(GameTime gameTime)
@@ -338,6 +346,10 @@ namespace ICS4U_Final_Project
             timer4.Start(); elapsed4 = timer4.Elapsed;
             timer5.Start(); elapsed5 = timer5.Elapsed;
             timer6.Start(); elapsed6 = timer6.Elapsed;
+
+            ssSpeed += 0.05;
+            if (ssSpeed > 4)
+                ssSpeed = 0;
 
             // - checking if mouse is in screen when target is attempted to be created
             if (mousePos.X > 0 && mousePos.X < 1080 && mousePos.Y > 0 && mousePos.Y < 720)
@@ -747,10 +759,14 @@ namespace ICS4U_Final_Project
             // - Testing area -------------------------------------------------------------------------------------------
 
             if (userHit)
-                _spriteBatch.DrawString(pointsFont, "", new Vector2(300, 300), Color.White);
+                _spriteBatch.DrawString(pointsFont, "", new Vector2(300, 300), Color.White);;
 
-            if (enemyPlanes.Count > 0)
-                _spriteBatch.DrawString(followingFont, enemyPlanes.Count.ToString(), new Vector2(40, 300), Color.White);
+
+            _spriteBatch.Draw(exploSSList[(int)Math.Round(ssSpeed)], new Rectangle(200, 300, 32, 32), null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 0f);
+
+            _spriteBatch.DrawString(followingFont, ((int)Math.Round(ssSpeed)).ToString(), new Vector2(40, 350), Color.White);
+
+            _spriteBatch.DrawString(followingFont, exploSSList.Count.ToString(), new Vector2(40, 400), Color.White);
 
 
             if (crashBool)
@@ -768,7 +784,7 @@ namespace ICS4U_Final_Project
         }
         public void UpgradeScreenDraw(GameTime gameTime)
         {
-            //GameScreenDraw(gameTime);
+            GameScreenDraw(gameTime);
 
             // - dim areas
             _spriteBatch.Draw(dimScreen, dimScreenRect, Color.Black * 0.3f);
