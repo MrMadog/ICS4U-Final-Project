@@ -26,14 +26,15 @@ namespace ICS4U_Final_Project
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        List<Button> buttons;
+        List<Button> upgradeButtons;
+        List<Button> hudButtons;
         List<Bullet> bullets;
         List<Trail> planeTrail;
         List<EnemyPlane> enemyPlanes;
         List<Texture2D> userPlaneTextures;
         List<Texture2D> enemyPlaneTextures;
-        List<Texture2D> explosionTextures;
-        List<Texture2D> exploSSList; 
+        List<Bomb> explosionsList;
+        List<Texture2D> exploTexturesList;
 
         Texture2D targetTexture, coinTexture, cursorTexture, bulletTexture, planeTrailTexture;
         Texture2D plusButtonTexture, plusButtonTextureP, minusButtonTexture, minusButtonTextureP, dimScreen;
@@ -54,8 +55,6 @@ namespace ICS4U_Final_Project
 
         float angle, prevAngle;
 
-        double ssSpeed;
-
         Point mouse;
 
         enum Screen
@@ -63,7 +62,7 @@ namespace ICS4U_Final_Project
             Intro, Game, Pause, Outro, Upgrade
         }
 
-        int coinSpawnX, coinSpawnY, points, totalPoints, i;
+        int coinSpawnX, coinSpawnY, points = 10000, totalPoints, bombs;
         int boostAmount, totalBoost, planeHealth, totalPlaneHealth, planeAmmo;
 
         Screen screen;
@@ -92,7 +91,8 @@ namespace ICS4U_Final_Project
 
         SpriteFont pointsFont, pointNumbers, followingFont, upgradeMenuFont, upgradeMenuInfoFont, currentFont, availablePointsFont, menuTitleFont;
 
-        SoundEffect planeShot, enemyPlaneShot;
+        SoundEffect planeShot, enemyPlaneShot, bombExplosion, engineSound;
+        SoundEffectInstance engineSoundInstance;
 
         public Game1()
         {
@@ -109,14 +109,15 @@ namespace ICS4U_Final_Project
 
             screen = Screen.Intro;
 
-            buttons = new List<Button>();
+            upgradeButtons = new List<Button>();
+            hudButtons = new List<Button>();
             bullets = new List<Bullet>();
             planeTrail = new List<Trail>();
             enemyPlanes = new List<EnemyPlane>();
             userPlaneTextures = new List<Texture2D>();
             enemyPlaneTextures = new List<Texture2D>();
-            explosionTextures = new List<Texture2D>();
-            exploSSList = new List<Texture2D>();
+            exploTexturesList = new List<Texture2D>();
+            explosionsList = new List<Bomb>();
 
             planeLocation = new Vector2(540, 800);
 
@@ -141,8 +142,6 @@ namespace ICS4U_Final_Project
 
             colour = new Color(0, 0, 0, 0);
 
-            i = 0;
-
             timer = new Stopwatch();
             timer2 = new Stopwatch();
             timer3 = new Stopwatch();
@@ -153,24 +152,36 @@ namespace ICS4U_Final_Project
             base.Initialize();
 
             // - minus buttons
-            buttons.Add(new Button(minusButtonTexture, minusButtonTextureP, new Rectangle(540, 240, 36, 36))); // 0
-            buttons.Add(new Button(minusButtonTexture, minusButtonTextureP, new Rectangle(540, 320, 36, 36))); // 1
-            buttons.Add(new Button(minusButtonTexture, minusButtonTextureP, new Rectangle(540, 400, 36, 36))); // 2
-            buttons.Add(new Button(minusButtonTexture, minusButtonTextureP, new Rectangle(540, 480, 36, 36))); // 3
+            upgradeButtons.Add(new Button(minusButtonTexture, minusButtonTextureP, new Rectangle(540, 240, 36, 36))); // 0
+            upgradeButtons.Add(new Button(minusButtonTexture, minusButtonTextureP, new Rectangle(540, 320, 36, 36))); // 1
+            upgradeButtons.Add(new Button(minusButtonTexture, minusButtonTextureP, new Rectangle(540, 400, 36, 36))); // 2
+            upgradeButtons.Add(new Button(minusButtonTexture, minusButtonTextureP, new Rectangle(540, 480, 36, 36))); // 3
             // - plus buttons
-            buttons.Add(new Button(plusButtonTexture, plusButtonTextureP, new Rectangle(590, 240, 36, 36))); // 4
-            buttons.Add(new Button(plusButtonTexture, plusButtonTextureP, new Rectangle(590, 320, 36, 36))); // 5
-            buttons.Add(new Button(plusButtonTexture, plusButtonTextureP, new Rectangle(590, 400, 36, 36))); // 6
-            buttons.Add(new Button(plusButtonTexture, plusButtonTextureP, new Rectangle(590, 480, 36, 36))); // 7
+            upgradeButtons.Add(new Button(plusButtonTexture, plusButtonTextureP, new Rectangle(590, 240, 36, 36))); // 4
+            upgradeButtons.Add(new Button(plusButtonTexture, plusButtonTextureP, new Rectangle(590, 320, 36, 36))); // 5
+            upgradeButtons.Add(new Button(plusButtonTexture, plusButtonTextureP, new Rectangle(590, 400, 36, 36))); // 6
+            upgradeButtons.Add(new Button(plusButtonTexture, plusButtonTextureP, new Rectangle(590, 480, 36, 36))); // 7
 
-            // userPlaneTextures.Add();
-
+            // - user plane textures
+            userPlaneTextures.Add(userPlaneTexture1);
+            userPlaneTextures.Add(userPlaneTexture2);
+            userPlaneTextures.Add(userPlaneTexture3);
+            userPlaneTextures.Add(userPlaneTexture4);
+            userPlaneTextures.Add(userPlaneTexture5);
+            userPlaneTextures.Add(userPlaneTexture6);
+            userPlaneTextures.Add(userPlaneTexture7);
+            userPlaneTextures.Add(userPlaneTexture8);
+            userPlaneTextures.Add(userPlaneTexture9);
+            userPlaneTextures.Add(userPlaneTexture10);
+            userPlaneTextures.Add(userPlaneTexture11);
+            // - enemy plane textures
             enemyPlaneTextures.Add(enemyPlaneTexture1);
             enemyPlaneTextures.Add(enemyPlaneTexture2);
             enemyPlaneTextures.Add(enemyPlaneTexture3);
             enemyPlaneTextures.Add(enemyPlaneTexture4);
             enemyPlaneTextures.Add(enemyPlaneTexture5);
             enemyPlaneTextures.Add(enemyPlaneTexture6);
+
         }
 
         protected override void LoadContent()
@@ -225,6 +236,8 @@ namespace ICS4U_Final_Project
             // - sounds
             planeShot = Content.Load<SoundEffect>("planeShot");
             enemyPlaneShot = Content.Load<SoundEffect>("enemyPlaneShot");
+            bombExplosion = Content.Load<SoundEffect>("explosion");
+            engineSound = Content.Load<SoundEffect>("planeEngine");
 
             static void SpriteSheet(GraphicsDevice graphicsDevice, Texture2D _texture, List<Texture2D> _textureList, int imageCount)
             {
@@ -244,7 +257,11 @@ namespace ICS4U_Final_Project
                 }
             }
 
-            SpriteSheet(GraphicsDevice, exploSpritesheet, exploSSList = new List<Texture2D>(), 5);
+            SpriteSheet(GraphicsDevice, exploSpritesheet, exploTexturesList = new List<Texture2D>(), 5);
+
+            engineSoundInstance = engineSound.CreateInstance();
+            engineSoundInstance.IsLooped = true;
+            engineSoundInstance.Volume = 1f;
         }
 
         protected override void Update(GameTime gameTime)
@@ -341,15 +358,13 @@ namespace ICS4U_Final_Project
         }
         public void GameScreenUpdate(GameTime gameTime)
         {
+            engineSoundInstance.Play();
+
             timer2.Start(); elapsed2 = timer2.Elapsed;
             timer3.Start(); elapsed3 = timer3.Elapsed;
             timer4.Start(); elapsed4 = timer4.Elapsed;
             timer5.Start(); elapsed5 = timer5.Elapsed;
             timer6.Start(); elapsed6 = timer6.Elapsed;
-
-            ssSpeed += 0.05;
-            if (ssSpeed > 4)
-                ssSpeed = 0;
 
             // - checking if mouse is in screen when target is attempted to be created
             if (mousePos.X > 0 && mousePos.X < 1080 && mousePos.Y > 0 && mousePos.Y < 720)
@@ -383,6 +398,7 @@ namespace ICS4U_Final_Project
             // - boost
             if (keyboardState.IsKeyDown(Keys.LeftShift))
             {
+                engineSoundInstance.Pitch = 0.7f;
                 if (boostAmount > 0)
                     planeLocation += planeDirection * 2;
                 else
@@ -390,9 +406,12 @@ namespace ICS4U_Final_Project
                 boostAmount -= 1;
                 if (boostAmount < 0)
                     boostAmount = 0;
+                if (boostAmount == 0)
+                    engineSoundInstance.Pitch = 0.4f;
             }
             else
             {
+                engineSoundInstance.Pitch = 0.4f;
                 planeLocation += planeDirection;
                 boostAmount += 1;
                 if (boostAmount > totalBoost)
@@ -566,6 +585,29 @@ namespace ICS4U_Final_Project
             foreach (Trail PlaneTrail in planeTrail)
                 PlaneTrail.Update();
 
+            foreach (Bomb explosion in explosionsList)
+                explosion.Update(gameTime);
+
+            // - bombs
+            if (keyboardState.IsKeyDown(Keys.M) && prevKeyboardState.IsKeyUp(Keys.M))
+            {
+                if (bombs >= 1)
+                {
+                    explosion = true;
+                    explosionsList.Add(new Bomb(exploTexturesList, new Rectangle((int)planeLocation.X - 16, (int)planeLocation.Y - 16, 32, 32), 0.05, bombExplosion));
+                    timer5.Restart();
+                    bombs -= 1;
+                }
+            }
+            if (explosion)
+            {
+                for (int i = 0; i < explosionsList.Count; i++)
+                {
+                    if (explosionsList[i].Done())
+                        explosionsList.RemoveAt(i);
+                }
+            }
+
             // - game over(health = 0)
             if (planeHealth <= 0)
             {
@@ -573,12 +615,10 @@ namespace ICS4U_Final_Project
             }
 
             // - random testing
-            if (keyboardState.IsKeyDown(Keys.RightShift) && prevKeyboardState.IsKeyUp(Keys.RightShift))
-            {
-                explosion = true;
-                timer5.Restart();
-            }
 
+
+
+            // - pause menu
             if (keyboardState.IsKeyDown(Keys.Escape) && prevKeyboardState.IsKeyUp(Keys.Escape))
             {
                 screen = Screen.Pause;
@@ -601,12 +641,12 @@ namespace ICS4U_Final_Project
 
             for (int i = 0; i < 8; i++)
             {
-                if (buttons[i].IsHovering(mouse))
+                if (upgradeButtons[i].IsHovering(mouse))
                     buttonHover = true;
             }
 
             // - row 1 (health cost 500 for +50, return for 400)
-            if (buttons[4].IsPressed())
+            if (upgradeButtons[4].IsPressed())
                 if (points >= 500 && totalPlaneHealth < 500)
                 {
                     totalPlaneHealth += 50;
@@ -614,51 +654,54 @@ namespace ICS4U_Final_Project
                         planeHealth = totalPlaneHealth;
                     points -= 500;
                 }
-            if (buttons[0].IsPressed())
+            if (upgradeButtons[0].IsPressed())
                 if (totalPlaneHealth >= 150)
                 {
                     totalPlaneHealth -= 50;
                     points += 400;
                 }
             // - row 2 (boost cost 200 for +25, return for 100)
-            if (buttons[5].IsPressed())
+            if (upgradeButtons[5].IsPressed())
                 if (points >= 200 && totalBoost < 1000)
                 {
                     totalBoost += 25;
                     points -= 200;
                 }
-            if (buttons[1].IsPressed())
+            if (upgradeButtons[1].IsPressed())
                 if (totalBoost >= 225)
                 {
                     totalBoost -= 25;
                     points += 100;
                 }
             // - row 3 (ammo cost 200 for + 5, return for 50/bullet)
-            if (buttons[6].IsPressed())
+            if (upgradeButtons[6].IsPressed())
                 if (planeAmmo < 40 && points >= 200)
                 {
                     planeAmmo += 5;
                     points -= 200;
                 }
-            if (buttons[2].IsPressed())
+            if (upgradeButtons[2].IsPressed())
                 if (planeAmmo > 1)
                 {
                     planeAmmo -= 2;
                     points += 50;
                 }
-            // - row 4
-            if (buttons[7].IsPressed())
-            {
-
-            }
-
-            if (buttons[3].IsPressed())
-            {
-
-            }
+            // - row 4 (bombs cost 400 for + 1, return for 300)
+            if (upgradeButtons[7].IsPressed())
+                if (bombs < 10 && points >= 400)
+                {
+                    bombs += 1;
+                    points -= 400;
+                }
+            if (upgradeButtons[3].IsPressed())
+                if (bombs >= 1)
+                {
+                    bombs -= 1;
+                    points += 300;
+                }
 
             for (int i = 0; i < 8; i++)
-                buttons[i].Update();
+                upgradeButtons[i].Update();
 
             if (keyboardState.IsKeyUp(Keys.Tab))
             {
@@ -714,6 +757,11 @@ namespace ICS4U_Final_Project
             // - plane shadow
             _spriteBatch.Draw(userPlane, planeShadowLocation, null, Color.Black * 0.4f, angle, origin, 1f, SpriteEffects.None, 0f);
 
+            // - bombs
+            if (explosion)
+                foreach (Bomb explosion in explosionsList)
+                    explosion.Draw(_spriteBatch);
+
             // - enemy planes
             foreach (EnemyPlane plane in enemyPlanes)
                 plane.Draw(_spriteBatch);
@@ -728,6 +776,9 @@ namespace ICS4U_Final_Project
 
             // - plane
             _spriteBatch.Draw(userPlane, planeLocation, null, Color.White, angle, origin, 1f, SpriteEffects.None, 0f);
+
+
+            // ---- HUD ------------------------------
 
             // - hud points
             _spriteBatch.DrawString(pointsFont, $"Points :  {points}", new Vector2(40, 40), Color.Black);
@@ -753,24 +804,23 @@ namespace ICS4U_Final_Project
             // - plane ammo
             _spriteBatch.DrawString(followingFont, $"Ammo: {planeAmmo}", new Vector2(40, 250), Color.White);
 
+            // - bomb count
+            _spriteBatch.DrawString(followingFont, $"Bombs: {bombs}", new Vector2(40, 300), Color.White);
+
 
 
 
             // - Testing area -------------------------------------------------------------------------------------------
 
-            if (userHit)
-                _spriteBatch.DrawString(pointsFont, "", new Vector2(300, 300), Color.White);;
 
-
-            _spriteBatch.Draw(exploSSList[(int)Math.Round(ssSpeed)], new Rectangle(200, 300, 32, 32), null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 0f);
-
-            _spriteBatch.DrawString(followingFont, ((int)Math.Round(ssSpeed)).ToString(), new Vector2(40, 350), Color.White);
-
-            _spriteBatch.DrawString(followingFont, exploSSList.Count.ToString(), new Vector2(40, 400), Color.White);
 
 
             if (crashBool)
                 _spriteBatch.DrawString(pointsFont, "BOOOOOOOOOOM", new Vector2(200, 400), Color.White);
+
+
+
+
 
             // - hitting enemies
             if (elapsed4.TotalSeconds < 2 && enemyHitBool == true)
@@ -792,7 +842,7 @@ namespace ICS4U_Final_Project
             _spriteBatch.Draw(dimScreen, upgradeMenuPointsRect, Color.Black * 0.5f);
             // buttons
             for (int i = 0; i < 8; i++)
-                buttons[i].Draw(_spriteBatch);
+                upgradeButtons[i].Draw(_spriteBatch);
             // lines
             _spriteBatch.DrawString(upgradeMenuFont, "Health   ..........................................", new Vector2(140, 250), Color.White);
             _spriteBatch.DrawString(upgradeMenuFont, "Boost     ..........................................", new Vector2(140, 330), Color.White);
@@ -800,8 +850,8 @@ namespace ICS4U_Final_Project
             _spriteBatch.DrawString(upgradeMenuFont, "Bombs    ..........................................", new Vector2(140, 490), Color.White);
             // available points
             _spriteBatch.DrawString(availablePointsFont, $"Available Points: {points}", new Vector2(110, 615), Color.White);
-            // info areas
-            if (buttons[0].IsHovering(mouse) || buttons[4].IsHovering(mouse))
+            // hover info area
+            if (upgradeButtons[0].IsHovering(mouse) || upgradeButtons[4].IsHovering(mouse))
             {
                 _spriteBatch.Draw(dimScreen, upgradeMenuInfoRect, Color.Black * 0.8f);
                 _spriteBatch.DrawString(followingFont, "Plane Health", new Vector2(700, 220), Color.White);
@@ -809,7 +859,7 @@ namespace ICS4U_Final_Project
                 _spriteBatch.DrawString(currentFont, "Current Max\r\nHealth:", new Vector2(700, 600), Color.White);
                 _spriteBatch.DrawString(pointsFont, totalPlaneHealth.ToString(), new Vector2(700, 660), Color.White);
             }
-            if (buttons[1].IsHovering(mouse) || buttons[5].IsHovering(mouse))
+            if (upgradeButtons[1].IsHovering(mouse) || upgradeButtons[5].IsHovering(mouse))
             {
                 _spriteBatch.Draw(dimScreen, upgradeMenuInfoRect, Color.Black * 0.8f);
                 _spriteBatch.DrawString(followingFont, "Boost", new Vector2(700, 220), Color.White);
@@ -817,7 +867,7 @@ namespace ICS4U_Final_Project
                 _spriteBatch.DrawString(currentFont, "Current Max\r\nBoost:", new Vector2(700, 600), Color.White);
                 _spriteBatch.DrawString(pointsFont, totalBoost.ToString(), new Vector2(700, 660), Color.White);
             }
-            if (buttons[2].IsHovering(mouse) || buttons[6].IsHovering(mouse))
+            if (upgradeButtons[2].IsHovering(mouse) || upgradeButtons[6].IsHovering(mouse))
             {
                 _spriteBatch.Draw(dimScreen, upgradeMenuInfoRect, Color.Black * 0.8f);
                 _spriteBatch.DrawString(followingFont, "Ammo", new Vector2(700, 220), Color.White);
@@ -825,11 +875,13 @@ namespace ICS4U_Final_Project
                 _spriteBatch.DrawString(currentFont, "Current Ammo:", new Vector2(700, 600), Color.White);
                 _spriteBatch.DrawString(pointsFont, planeAmmo.ToString(), new Vector2(700, 660), Color.White);
             }
-            if (buttons[3].IsHovering(mouse) || buttons[7].IsHovering(mouse))
+            if (upgradeButtons[3].IsHovering(mouse) || upgradeButtons[7].IsHovering(mouse))
             {
                 _spriteBatch.Draw(dimScreen, upgradeMenuInfoRect, Color.Black * 0.8f);
                 _spriteBatch.DrawString(followingFont, "Bombs", new Vector2(700, 220), Color.White);
-                _spriteBatch.DrawString(upgradeMenuInfoFont, "Clicking the ''+'' will give you +25\r\nmax boost cap.\r\nCost: 200 Points\r\n\r\nClicking the ''-'' will take -25\r\nfrom your max boost cap, and \r\ngive you some credits back.\r\nRefund: 100 Points ", new Vector2(700, 250), Color.White);
+                _spriteBatch.DrawString(upgradeMenuInfoFont, "Clicking the ''+'' will give you +1\r\nbomb.\r\nCost: 400 Points\r\n\r\nClicking the ''-'' will take -1\r\nbomb, and \r\ngive you some credits back.\r\nRefund: 300 Points ", new Vector2(700, 250), Color.White);
+                _spriteBatch.DrawString(currentFont, "Current Bombs:", new Vector2(700, 600), Color.White);
+                _spriteBatch.DrawString(pointsFont, bombs.ToString(), new Vector2(700, 660), Color.White);
             }
 
             if (buttonHover == true)
