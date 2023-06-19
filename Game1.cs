@@ -45,7 +45,7 @@ namespace ICS4U_Final_Project
         // enemy planes
         Texture2D enemyPlane, enemyPlaneTexture1, enemyPlaneTexture2, enemyPlaneTexture3, enemyPlaneTexture4, enemyPlaneTexture5, enemyPlaneTexture6;
 
-        Texture2D exploSpritesheet;
+        Texture2D exploSpritesheet, bombTexture;
 
         Rectangle targetRect, coinRect, cursorRect, cursorHoverRect;
         Rectangle dimScreenRect, upgradeMenuRect, upgradeMenuInfoRect, upgradeMenuPointsRect;
@@ -200,6 +200,7 @@ namespace ICS4U_Final_Project
             bulletTexture = Content.Load<Texture2D>("planeBullet");
             planeTrailTexture = Content.Load<Texture2D>("circle");
             exploSpritesheet = Content.Load<Texture2D>("explosion_spritesheet");
+            bombTexture = Content.Load<Texture2D>("tile_0012");
 
             // - user planes
             userPlaneTexture1 = Content.Load<Texture2D>("plane 1");
@@ -594,7 +595,7 @@ namespace ICS4U_Final_Project
                 if (bombs >= 1)
                 {
                     explosion = true;
-                    explosionsList.Add(new Bomb(exploTexturesList, new Rectangle((int)planeLocation.X - 16, (int)planeLocation.Y - 16, 32, 32), 0.05, bombExplosion));
+                    explosionsList.Add(new Bomb(exploTexturesList, bombTexture, new Rectangle((int)planeLocation.X - 16, (int)planeLocation.Y - 16, 32, 32), 0.05, bombExplosion));
                     timer5.Restart();
                     bombs -= 1;
                 }
@@ -632,6 +633,7 @@ namespace ICS4U_Final_Project
         }
         public void UpgradeScreenUpdate(GameTime gameTime)
         {
+            engineSoundInstance.Stop();
             foreach (EnemyPlane enemy in enemyPlanes)
             {
                 enemy.enemyTimer.Stop();
