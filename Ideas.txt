@@ -55,7 +55,6 @@
 
 	Things to do:
 		- Enemies(getting there)
-		- Bombs(getting there)
 		- Intro and outro screens
 		- Improve UI and add onto button class(sounds)
 		- Add subtle engine sound effect

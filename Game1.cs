@@ -68,7 +68,7 @@ namespace ICS4U_Final_Project
         Screen screen;
 
         Vector2 origin, planeLocation, prevPlaneLocation, planeShadowLocation, mousePos, planeDirection, target, coinSpawnCircle, coinPoints;
-        Vector2 damagePoints, killPoints;
+        Vector2 damagePoints, killPoints, groundCrosshair;
 
         Circle mouseCircle, targetCircle, coinCircle, userHitbox;
 
@@ -91,7 +91,7 @@ namespace ICS4U_Final_Project
 
         SpriteFont pointsFont, pointNumbers, followingFont, upgradeMenuFont, upgradeMenuInfoFont, currentFont, availablePointsFont, menuTitleFont;
 
-        SoundEffect planeShot, enemyPlaneShot, bombExplosion, engineSound;
+        SoundEffect planeShot, enemyPlaneShot, bombExplosion, engineSound, UpgradeButton;
         SoundEffectInstance engineSoundInstance;
 
         public Game1()
@@ -120,6 +120,7 @@ namespace ICS4U_Final_Project
             explosionsList = new List<Bomb>();
 
             planeLocation = new Vector2(540, 800);
+            groundCrosshair = planeLocation;
 
             coinSpawnX = generator.Next(50, 1020);
             coinSpawnY = generator.Next(50, 300);
@@ -152,15 +153,15 @@ namespace ICS4U_Final_Project
             base.Initialize();
 
             // - minus buttons
-            upgradeButtons.Add(new Button(minusButtonTexture, minusButtonTextureP, new Rectangle(540, 240, 36, 36))); // 0
-            upgradeButtons.Add(new Button(minusButtonTexture, minusButtonTextureP, new Rectangle(540, 320, 36, 36))); // 1
-            upgradeButtons.Add(new Button(minusButtonTexture, minusButtonTextureP, new Rectangle(540, 400, 36, 36))); // 2
-            upgradeButtons.Add(new Button(minusButtonTexture, minusButtonTextureP, new Rectangle(540, 480, 36, 36))); // 3
+            upgradeButtons.Add(new Button(minusButtonTexture, minusButtonTextureP, new Rectangle(540, 240, 36, 36), UpgradeButton)); // 0
+            upgradeButtons.Add(new Button(minusButtonTexture, minusButtonTextureP, new Rectangle(540, 320, 36, 36), UpgradeButton)); // 1
+            upgradeButtons.Add(new Button(minusButtonTexture, minusButtonTextureP, new Rectangle(540, 400, 36, 36), UpgradeButton)); // 2
+            upgradeButtons.Add(new Button(minusButtonTexture, minusButtonTextureP, new Rectangle(540, 480, 36, 36), UpgradeButton)); // 3
             // - plus buttons
-            upgradeButtons.Add(new Button(plusButtonTexture, plusButtonTextureP, new Rectangle(590, 240, 36, 36))); // 4
-            upgradeButtons.Add(new Button(plusButtonTexture, plusButtonTextureP, new Rectangle(590, 320, 36, 36))); // 5
-            upgradeButtons.Add(new Button(plusButtonTexture, plusButtonTextureP, new Rectangle(590, 400, 36, 36))); // 6
-            upgradeButtons.Add(new Button(plusButtonTexture, plusButtonTextureP, new Rectangle(590, 480, 36, 36))); // 7
+            upgradeButtons.Add(new Button(plusButtonTexture, plusButtonTextureP, new Rectangle(590, 240, 36, 36), UpgradeButton)); // 4
+            upgradeButtons.Add(new Button(plusButtonTexture, plusButtonTextureP, new Rectangle(590, 320, 36, 36), UpgradeButton)); // 5
+            upgradeButtons.Add(new Button(plusButtonTexture, plusButtonTextureP, new Rectangle(590, 400, 36, 36), UpgradeButton)); // 6
+            upgradeButtons.Add(new Button(plusButtonTexture, plusButtonTextureP, new Rectangle(590, 480, 36, 36), UpgradeButton)); // 7
 
             // - user plane textures
             userPlaneTextures.Add(userPlaneTexture1);
@@ -239,6 +240,7 @@ namespace ICS4U_Final_Project
             enemyPlaneShot = Content.Load<SoundEffect>("enemyPlaneShot");
             bombExplosion = Content.Load<SoundEffect>("explosion");
             engineSound = Content.Load<SoundEffect>("planeEngine");
+            UpgradeButton = Content.Load<SoundEffect>("UpgradeButtonSound");
 
             static void SpriteSheet(GraphicsDevice graphicsDevice, Texture2D _texture, List<Texture2D> _textureList, int imageCount)
             {
@@ -291,6 +293,9 @@ namespace ICS4U_Final_Project
             cursorHoverRect.Y = mouseState.Y - 14;
 
             buttonHover = false;
+
+            groundCrosshair.X = planeLocation.X;
+            groundCrosshair.Y = planeLocation.Y + 30;
 
             if (screen == Screen.Intro)
                 IntroScreenUpdate(gameTime);
@@ -595,7 +600,7 @@ namespace ICS4U_Final_Project
                 if (bombs >= 1)
                 {
                     explosion = true;
-                    explosionsList.Add(new Bomb(exploTexturesList, bombTexture, new Rectangle((int)planeLocation.X - 16, (int)planeLocation.Y - 16, 32, 32), 0.05, bombExplosion));
+                    explosionsList.Add(new Bomb(exploTexturesList, new Vector2(planeLocation.X, planeLocation.Y), bombTexture, angle, 0.05, bombExplosion));
                     timer5.Restart();
                     bombs -= 1;
                 }
@@ -758,6 +763,9 @@ namespace ICS4U_Final_Project
 
             // - plane shadow
             _spriteBatch.Draw(userPlane, planeShadowLocation, null, Color.Black * 0.4f, angle, origin, 1f, SpriteEffects.None, 0f);
+
+            // - ground crosshair
+            _spriteBatch.Draw(coinTexture, new Rectangle((int)groundCrosshair.X, (int)groundCrosshair.Y, 5, 5), Color.DarkRed);
 
             // - bombs
             if (explosion)

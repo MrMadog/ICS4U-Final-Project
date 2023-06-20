@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -7,23 +8,28 @@ namespace ICS4U_Final_Project
 {
     internal class Button
     {
-        MouseState mouseState, prevMouseState;
+        private MouseState mouseState, prevMouseState;
 
-        Point mouse;
+        private Point mouse;
 
         private Texture2D _drawTexture;
-        public Texture2D _texture { get; set; }
-        public Texture2D _texture2 { get; set; }
-        public Rectangle _rectangle { get; set; }
+        private Texture2D _texture;
+        private Texture2D _texture2;
+        private Rectangle _rectangle;
+        private SoundEffect _soundEffect;
+        private SoundEffectInstance _soundEffectInstance;
 
 
-        public Button(Texture2D Texture, Texture2D Texture2, Rectangle Rectangle)
+        public Button(Texture2D Texture, Texture2D Texture2, Rectangle Rectangle, SoundEffect soundEffect)
         {
             _texture = Texture;
             _texture2 = Texture2;
             _rectangle = Rectangle;
+            _soundEffect = soundEffect;
 
             _drawTexture = _texture;
+
+            _soundEffectInstance = _soundEffect.CreateInstance();
         }
 
         public bool IsHovering(Point point)
@@ -46,8 +52,12 @@ namespace ICS4U_Final_Project
             _drawTexture = _texture;
 
             if (_rectangle.Contains(mouse))
+            {
                 if (mouseState.LeftButton == ButtonState.Pressed)
                     _drawTexture = _texture2;
+                if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released)
+                    _soundEffectInstance.Play();
+            }
         }
 
         public void Draw(SpriteBatch _spriteBatch)

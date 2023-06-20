@@ -489,3 +489,9 @@
 /processorParam:TextureFormat=Compressed
 /build:upgrade_menu_info.spritefont
 
+#begin UpgradeButtonSound.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:UpgradeButtonSound.mp3
+
