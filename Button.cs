@@ -17,7 +17,6 @@ namespace ICS4U_Final_Project
         private Texture2D _texture2;
         private Rectangle _rectangle;
         private SoundEffect _soundEffect;
-        private SoundEffectInstance _soundEffectInstance;
 
 
         public Button(Texture2D Texture, Texture2D Texture2, Rectangle Rectangle, SoundEffect soundEffect)
@@ -28,8 +27,6 @@ namespace ICS4U_Final_Project
             _soundEffect = soundEffect;
 
             _drawTexture = _texture;
-
-            _soundEffectInstance = _soundEffect.CreateInstance();
         }
 
         public bool IsHovering(Point point)
@@ -56,7 +53,7 @@ namespace ICS4U_Final_Project
                 if (mouseState.LeftButton == ButtonState.Pressed)
                     _drawTexture = _texture2;
                 if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released)
-                    _soundEffectInstance.Play();
+                    _soundEffect.Play();
             }
         }
 

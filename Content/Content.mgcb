@@ -32,6 +32,9 @@
 /processorParam:TextureFormat=Color
 /build:circle.png
 
+#begin Comicoro.ttf
+/copy:Comicoro.ttf
+
 #begin Current Font.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
@@ -50,6 +53,9 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:cursor.png
+
+#begin Daydream.ttf
+/copy:Daydream.ttf
 
 #begin enemy plane 1.png
 /importer:TextureImporter
@@ -184,6 +190,12 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:minusbuttonpressed.png
+
+#begin MinusButtonSound.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:MinusButtonSound.mp3
 
 #begin plane 1.png
 /importer:TextureImporter
@@ -365,6 +377,12 @@
 /processorParam:TextureFormat=Color
 /build:plusbuttonpressed.png
 
+#begin PlusButtonSound.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:PlusButtonSound.mp3
+
 #begin pointNumbers.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
@@ -378,6 +396,9 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:points.spritefont
+
+#begin prstartk.ttf
+/copy:prstartk.ttf
 
 #begin rectangle.png
 /importer:TextureImporter
@@ -488,10 +509,4 @@
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
 /build:upgrade_menu_info.spritefont
-
-#begin UpgradeButtonSound.mp3
-/importer:Mp3Importer
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:UpgradeButtonSound.mp3
 

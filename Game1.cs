@@ -91,7 +91,7 @@ namespace ICS4U_Final_Project
 
         SpriteFont pointsFont, pointNumbers, followingFont, upgradeMenuFont, upgradeMenuInfoFont, currentFont, availablePointsFont, menuTitleFont;
 
-        SoundEffect planeShot, enemyPlaneShot, bombExplosion, engineSound, UpgradeButton;
+        SoundEffect planeShot, enemyPlaneShot, bombExplosion, engineSound, plusButton, minusButton;
         SoundEffectInstance engineSoundInstance;
 
         public Game1()
@@ -153,15 +153,15 @@ namespace ICS4U_Final_Project
             base.Initialize();
 
             // - minus buttons
-            upgradeButtons.Add(new Button(minusButtonTexture, minusButtonTextureP, new Rectangle(540, 240, 36, 36), UpgradeButton)); // 0
-            upgradeButtons.Add(new Button(minusButtonTexture, minusButtonTextureP, new Rectangle(540, 320, 36, 36), UpgradeButton)); // 1
-            upgradeButtons.Add(new Button(minusButtonTexture, minusButtonTextureP, new Rectangle(540, 400, 36, 36), UpgradeButton)); // 2
-            upgradeButtons.Add(new Button(minusButtonTexture, minusButtonTextureP, new Rectangle(540, 480, 36, 36), UpgradeButton)); // 3
+            upgradeButtons.Add(new Button(minusButtonTexture, minusButtonTextureP, new Rectangle(540, 240, 36, 36), minusButton)); // 0
+            upgradeButtons.Add(new Button(minusButtonTexture, minusButtonTextureP, new Rectangle(540, 320, 36, 36), minusButton)); // 1
+            upgradeButtons.Add(new Button(minusButtonTexture, minusButtonTextureP, new Rectangle(540, 400, 36, 36), minusButton)); // 2
+            upgradeButtons.Add(new Button(minusButtonTexture, minusButtonTextureP, new Rectangle(540, 480, 36, 36), minusButton)); // 3
             // - plus buttons
-            upgradeButtons.Add(new Button(plusButtonTexture, plusButtonTextureP, new Rectangle(590, 240, 36, 36), UpgradeButton)); // 4
-            upgradeButtons.Add(new Button(plusButtonTexture, plusButtonTextureP, new Rectangle(590, 320, 36, 36), UpgradeButton)); // 5
-            upgradeButtons.Add(new Button(plusButtonTexture, plusButtonTextureP, new Rectangle(590, 400, 36, 36), UpgradeButton)); // 6
-            upgradeButtons.Add(new Button(plusButtonTexture, plusButtonTextureP, new Rectangle(590, 480, 36, 36), UpgradeButton)); // 7
+            upgradeButtons.Add(new Button(plusButtonTexture, plusButtonTextureP, new Rectangle(590, 240, 36, 36), plusButton)); // 4
+            upgradeButtons.Add(new Button(plusButtonTexture, plusButtonTextureP, new Rectangle(590, 320, 36, 36), plusButton)); // 5
+            upgradeButtons.Add(new Button(plusButtonTexture, plusButtonTextureP, new Rectangle(590, 400, 36, 36), plusButton)); // 6
+            upgradeButtons.Add(new Button(plusButtonTexture, plusButtonTextureP, new Rectangle(590, 480, 36, 36), plusButton)); // 7
 
             // - user plane textures
             userPlaneTextures.Add(userPlaneTexture1);
@@ -240,7 +240,8 @@ namespace ICS4U_Final_Project
             enemyPlaneShot = Content.Load<SoundEffect>("enemyPlaneShot");
             bombExplosion = Content.Load<SoundEffect>("explosion");
             engineSound = Content.Load<SoundEffect>("planeEngine");
-            UpgradeButton = Content.Load<SoundEffect>("UpgradeButtonSound");
+            plusButton = Content.Load<SoundEffect>("PlusButtonSound");
+            minusButton = Content.Load<SoundEffect>("MinusButtonSound");
 
             static void SpriteSheet(GraphicsDevice graphicsDevice, Texture2D _texture, List<Texture2D> _textureList, int imageCount)
             {
@@ -765,7 +766,7 @@ namespace ICS4U_Final_Project
             _spriteBatch.Draw(userPlane, planeShadowLocation, null, Color.Black * 0.4f, angle, origin, 1f, SpriteEffects.None, 0f);
 
             // - ground crosshair
-            _spriteBatch.Draw(coinTexture, new Rectangle((int)groundCrosshair.X, (int)groundCrosshair.Y, 5, 5), Color.DarkRed);
+            _spriteBatch.Draw(coinTexture, new Rectangle((int)groundCrosshair.X, (int)groundCrosshair.Y, 5, 5), Color.Black * 0.6f);
 
             // - bombs
             if (explosion)
@@ -881,7 +882,7 @@ namespace ICS4U_Final_Project
             {
                 _spriteBatch.Draw(dimScreen, upgradeMenuInfoRect, Color.Black * 0.8f);
                 _spriteBatch.DrawString(followingFont, "Ammo", new Vector2(700, 220), Color.White);
-                _spriteBatch.DrawString(upgradeMenuInfoFont, "Clicking the ''+'' will give you +5\r\nammo.\r\nCost: 200 Points\r\n\r\nClicking the ''-'' will take -1 ammo,\r\nand give you some credits back.\r\nRefund: 50 Points ", new Vector2(700, 250), Color.White);
+                _spriteBatch.DrawString(upgradeMenuInfoFont, "Clicking the ''+'' will give you +5\r\nammo.\r\nCost: 200 Points\r\n\r\nClicking the ''-'' will take -2 ammo,\r\nand give you some credits back.\r\nRefund: 50 Points ", new Vector2(700, 250), Color.White);
                 _spriteBatch.DrawString(currentFont, "Current Ammo:", new Vector2(700, 600), Color.White);
                 _spriteBatch.DrawString(pointsFont, planeAmmo.ToString(), new Vector2(700, 660), Color.White);
             }
@@ -907,7 +908,9 @@ namespace ICS4U_Final_Project
         }
         public void OutroScreenDraw(GameTime gameTime)
         {
-            _spriteBatch.DrawString(followingFont, $"You got {totalPoints} points!", new Vector2(300, 400), Color.Black);
+            _spriteBatch.DrawString(menuTitleFont, "Game Over!", new Vector2(350, 200), Color.Black);
+
+            _spriteBatch.DrawString(menuTitleFont, $"You got {totalPoints} points!", new Vector2(275, 350), Color.White);
 
             // - cursor
             if (buttonHover == true)

@@ -57,7 +57,6 @@
 		- Enemies(getting there)
 		- Intro and outro screens
 		- Improve UI and add onto button class(sounds)
-		- Add subtle engine sound effect
 		- Move trail into trail class(adding cirlces to list)
 		- Tell user when they have hit the maximum for any upgrade
 		- Move all timers into a list
