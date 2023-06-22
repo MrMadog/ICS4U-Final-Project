@@ -60,7 +60,5 @@
 		- Move trail into trail class(adding cirlces to list)
 		- Tell user when they have hit the maximum for any upgrade
 		- Move all timers into a list
-		- health boost pickups or maybe healing stations
-
-
-	https://pixabay.com/sound-effects/search/gunshot/
+		- Health boost pickups or maybe healing stations
+		- Improve Coin Textures(Make Border Thicker)

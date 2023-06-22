@@ -17,7 +17,6 @@ namespace ICS4U_Final_Project
         private Texture2D _bombTexture;
         private Stopwatch timer;
         private TimeSpan elapsed;
-        private double _speed;
         private double _index;
         private double _bombAlt;
         private double _bombShadowY;
@@ -29,11 +28,10 @@ namespace ICS4U_Final_Project
         private Vector2 _ShadowLocation;
         private bool explode = false;
 
-        public Bomb(List<Texture2D> explosion, Vector2 location, Texture2D bomb, float rotation, double speed, SoundEffect soundEffect)
+        public Bomb(List<Texture2D> explosion, Vector2 location, Texture2D bomb, float rotation, SoundEffect soundEffect)
         {
             _spriteSheet = explosion;
             _bombTexture = bomb;
-            _speed = speed;
             _soundEffect = soundEffect;
             _rotation = rotation;
             _location = location;
@@ -75,7 +73,7 @@ namespace ICS4U_Final_Project
 
             if (elapsed.TotalSeconds >= 1)
             {
-                _index += _speed;
+                _index += 0.05;
                 explode = true;
             }
 

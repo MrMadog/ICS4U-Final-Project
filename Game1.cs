@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Reflection;
 using System.Threading;
 
 namespace ICS4U_Final_Project
@@ -35,8 +36,9 @@ namespace ICS4U_Final_Project
         List<Texture2D> enemyPlaneTextures;
         List<Bomb> explosionsList;
         List<Texture2D> exploTexturesList;
+        List<Texture2D> coinTexturesList;
 
-        Texture2D targetTexture, coinTexture, cursorTexture, bulletTexture, planeTrailTexture;
+        Texture2D targetTexture, circleTexture, cursorTexture, bulletTexture, planeTrailTexture;
         Texture2D plusButtonTexture, plusButtonTextureP, minusButtonTexture, minusButtonTextureP, dimScreen;
 
         // user planes
@@ -45,9 +47,9 @@ namespace ICS4U_Final_Project
         // enemy planes
         Texture2D enemyPlane, enemyPlaneTexture1, enemyPlaneTexture2, enemyPlaneTexture3, enemyPlaneTexture4, enemyPlaneTexture5, enemyPlaneTexture6;
 
-        Texture2D exploSpritesheet, bombTexture;
+        Texture2D exploSpritesheet, bombTexture, coinSpritesheet, coinTexture;
 
-        Rectangle targetRect, coinRect, cursorRect, cursorHoverRect;
+        Rectangle targetRect, coinRect, cursorRect, cursorHoverRect, htpRect;
         Rectangle dimScreenRect, upgradeMenuRect, upgradeMenuInfoRect, upgradeMenuPointsRect;
 
         MouseState mouseState, prevMouseState;
@@ -59,16 +61,18 @@ namespace ICS4U_Final_Project
 
         enum Screen
         {
-            Intro, Game, Pause, Outro, Upgrade
+            Intro, Settings, Game, Pause, Outro, Upgrade
         }
 
         int coinSpawnX, coinSpawnY, points = 10000, totalPoints, bombs;
         int boostAmount, totalBoost, planeHealth, totalPlaneHealth, planeAmmo;
 
+        double coinIndex;
+
         Screen screen;
 
         Vector2 origin, planeLocation, prevPlaneLocation, planeShadowLocation, mousePos, planeDirection, target, coinSpawnCircle, coinPoints;
-        Vector2 damagePoints, killPoints, groundCrosshair;
+        Vector2 damagePoints, killPoints, groundCrosshair, userDamagePoints;
 
         Circle mouseCircle, targetCircle, coinCircle, userHitbox;
 
@@ -86,8 +90,9 @@ namespace ICS4U_Final_Project
         bool bulletBool = false;
         bool enemyHitBool = false;
         bool explosion = false;
-        bool userHit = false;
         bool crashBool = false;
+        bool userHitBool = false;
+        bool htpHover = false;
 
         SpriteFont pointsFont, pointNumbers, followingFont, upgradeMenuFont, upgradeMenuInfoFont, currentFont, availablePointsFont, menuTitleFont;
 
@@ -129,6 +134,8 @@ namespace ICS4U_Final_Project
 
             cursorRect = new Rectangle(0, 0, 32, 32);
             cursorHoverRect = new Rectangle(0, 0, 28, 28);
+
+            htpRect = new Rectangle(75, 600, 219, 30);
 
             boostAmount = 200;
             totalBoost = boostAmount;
@@ -191,7 +198,8 @@ namespace ICS4U_Final_Project
             
             // - textures
             targetTexture = Content.Load<Texture2D>("target");
-            coinTexture = Content.Load<Texture2D>("circle");
+            coinSpritesheet = Content.Load<Texture2D>("coinSpritesheet");
+            circleTexture = Content.Load<Texture2D>("circle");
             cursorTexture = Content.Load<Texture2D>("cursor");
             plusButtonTexture = Content.Load<Texture2D>("plusbuttonnotpressed");
             minusButtonTexture = Content.Load<Texture2D>("minusbuttonnotpressed");
@@ -262,6 +270,7 @@ namespace ICS4U_Final_Project
             }
 
             SpriteSheet(GraphicsDevice, exploSpritesheet, exploTexturesList = new List<Texture2D>(), 5);
+            SpriteSheet(GraphicsDevice, coinSpritesheet, coinTexturesList = new List<Texture2D>(), 5);
 
             engineSoundInstance = engineSound.CreateInstance();
             engineSoundInstance.IsLooped = true;
@@ -297,6 +306,11 @@ namespace ICS4U_Final_Project
 
             groundCrosshair.X = planeLocation.X;
             groundCrosshair.Y = planeLocation.Y + 30;
+
+            coinIndex += 0.1;
+            if (coinIndex >= coinTexturesList.Count - 0.5)
+                coinIndex = 0;
+
 
             if (screen == Screen.Intro)
                 IntroScreenUpdate(gameTime);
@@ -348,20 +362,25 @@ namespace ICS4U_Final_Project
         // - Updates
         public void IntroScreenUpdate(GameTime gameTime)
         {
-            if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released)
+            htpHover = false;
+
+            if (htpRect.Contains(mouse))
             {
-                fadeBool = true;
+                htpHover = true;
+                buttonHover = true;
             }
+
+            if (mouseState.LeftButton == ButtonState.Pressed && prevMouseState.LeftButton == ButtonState.Released && htpHover == false)
+                fadeBool = true;
+
             if (fadeBool == true)
                 colour.A += 5;
 
             if (colour.A >= 255)
                 done = true;
-
+            
             if (done == true)
-            {
                 screen = Screen.Game;
-            }
         }
         public void GameScreenUpdate(GameTime gameTime)
         {
@@ -517,9 +536,11 @@ namespace ICS4U_Final_Project
                 {
                     if (userHitbox.Contains(enemy[i]) && !enemy.Contains(planeLocation))
                     {
-                        userHit = true;
                         enemy.HitIndex = i;
                         planeHealth -= 25;
+                        userHitBool = true;
+                        timer6.Restart();
+                        userDamagePoints = new Vector2(planeLocation.X + 20, planeLocation.Y + 30);
                     }
                 }
             }
@@ -596,12 +617,12 @@ namespace ICS4U_Final_Project
                 explosion.Update(gameTime);
 
             // - bombs
-            if (keyboardState.IsKeyDown(Keys.M) && prevKeyboardState.IsKeyUp(Keys.M))
+            if (keyboardState.IsKeyDown(Keys.LeftControl) && prevKeyboardState.IsKeyUp(Keys.LeftControl))
             {
                 if (bombs >= 1)
                 {
                     explosion = true;
-                    explosionsList.Add(new Bomb(exploTexturesList, new Vector2(planeLocation.X, planeLocation.Y), bombTexture, angle, 0.05, bombExplosion));
+                    explosionsList.Add(new Bomb(exploTexturesList, new Vector2(planeLocation.X, planeLocation.Y), bombTexture, angle, bombExplosion));
                     timer5.Restart();
                     bombs -= 1;
                 }
@@ -687,6 +708,8 @@ namespace ICS4U_Final_Project
                 {
                     planeAmmo += 5;
                     points -= 200;
+                    if (planeAmmo > 40)
+                        planeAmmo = 40;
                 }
             if (upgradeButtons[2].IsPressed())
                 if (planeAmmo > 1)
@@ -724,6 +747,7 @@ namespace ICS4U_Final_Project
         }
         public void PauseScreenUpdate(GameTime gameTime)
         {
+            engineSoundInstance.Stop();
             foreach (EnemyPlane enemy in enemyPlanes)
             {
                 enemy.enemyTimer.Stop();
@@ -736,7 +760,7 @@ namespace ICS4U_Final_Project
         }
         public void OutroScreenUpdate(GameTime gameTime)
         {
-
+            engineSoundInstance.Stop();
         }
         // - Draws
         public void IntroScreenDraw(GameTime gameTime)
@@ -744,9 +768,21 @@ namespace ICS4U_Final_Project
             // - game title
             _spriteBatch.DrawString(menuTitleFont, "To The Clouds", new Vector2(60, 80), Color.White);
 
+            // - instruction
+            _spriteBatch.DrawString(followingFont, "Press Anywhere to Begin", new Vector2(400, 650), Color.Gray);
+
+            // - how to play
+            if (htpHover)
+            {
+                _spriteBatch.DrawString(pointsFont, "How To Play", new Vector2(75, 600), Color.White);
+                _spriteBatch.DrawString(upgradeMenuInfoFont, "Left Click - Set Pin\r\nRight Click - Delete Pin\r\nLeft Shift - Boost\r\nTab - Open Upgrade Menu\r\nSpacebar - Shoot\r\nLeft Control - Drop Bomb", new Vector2(50, 420), Color.White);
+            }
+            else
+                _spriteBatch.DrawString(pointsFont, "How To Play", new Vector2(75, 600), Color.LightGray);
+
             // - cursor
             if (buttonHover == true)
-                _spriteBatch.Draw(cursorTexture, cursorHoverRect, Color.DarkGray);
+                _spriteBatch.Draw(cursorTexture, cursorHoverRect, Color.Gray);
             else
                 _spriteBatch.Draw(cursorTexture, cursorRect, Color.White);
 
@@ -756,7 +792,7 @@ namespace ICS4U_Final_Project
         public void GameScreenDraw(GameTime gameTime)
         {
             // - coins
-            _spriteBatch.Draw(coinTexture, coinRect, Color.White);
+            _spriteBatch.Draw(coinTexturesList[(int)Math.Round(coinIndex)], coinRect, Color.White);
 
             // - pin
             if (targetBool == true)
@@ -766,7 +802,7 @@ namespace ICS4U_Final_Project
             _spriteBatch.Draw(userPlane, planeShadowLocation, null, Color.Black * 0.4f, angle, origin, 1f, SpriteEffects.None, 0f);
 
             // - ground crosshair
-            _spriteBatch.Draw(coinTexture, new Rectangle((int)groundCrosshair.X, (int)groundCrosshair.Y, 5, 5), Color.Black * 0.6f);
+            _spriteBatch.Draw(circleTexture, new Rectangle((int)groundCrosshair.X, (int)groundCrosshair.Y, 5, 5), Color.Black * 0.6f);
 
             // - bombs
             if (explosion)
@@ -796,9 +832,11 @@ namespace ICS4U_Final_Project
 
             // - points numbers
             if (elapsed.TotalSeconds < 3 && coinPointsBool == true)
-                _spriteBatch.DrawString(pointNumbers, "+100", coinPoints, Color.White);
+                _spriteBatch.DrawString(pointNumbers, "+100", coinPoints, Color.Gold);
             if (elapsed4.TotalSeconds < 3 && enemyKillBool == true)
-                _spriteBatch.DrawString(pointNumbers, "+250", killPoints, Color.White);
+                _spriteBatch.DrawString(pointNumbers, "+250", killPoints, Color.Gray);
+            if (elapsed6.TotalSeconds < 3 && userHitBool == true)
+                _spriteBatch.DrawString(pointNumbers, "25", userDamagePoints, Color.DarkRed);
 
             // - boost amount
             _spriteBatch.DrawString(followingFont, $"Boost: {boostAmount}", new Vector2(40, 100), Color.White);
