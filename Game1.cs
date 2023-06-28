@@ -54,7 +54,7 @@ namespace ICS4U_Final_Project
 
         MouseState mouseState, prevMouseState;
         KeyboardState keyboardState, prevKeyboardState;
-
+        
         float angle, prevAngle;
 
         Point mouse;
