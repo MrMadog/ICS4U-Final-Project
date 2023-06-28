@@ -47,7 +47,7 @@ namespace ICS4U_Final_Project
         // enemy planes
         Texture2D enemyPlane, enemyPlaneTexture1, enemyPlaneTexture2, enemyPlaneTexture3, enemyPlaneTexture4, enemyPlaneTexture5, enemyPlaneTexture6;
 
-        Texture2D exploSpritesheet, bombTexture, coinSpritesheet, coinTexture;
+        Texture2D exploSpritesheet, bombTexture, coinSpritesheet;
 
         Rectangle targetRect, coinRect, cursorRect, cursorHoverRect, htpRect;
         Rectangle dimScreenRect, upgradeMenuRect, upgradeMenuInfoRect, upgradeMenuPointsRect;
@@ -390,7 +390,6 @@ namespace ICS4U_Final_Project
             timer3.Start(); elapsed3 = timer3.Elapsed;
             timer4.Start(); elapsed4 = timer4.Elapsed;
             timer5.Start(); elapsed5 = timer5.Elapsed;
-            timer6.Start(); elapsed6 = timer6.Elapsed;
 
             // - checking if mouse is in screen when target is attempted to be created
             if (mousePos.X > 0 && mousePos.X < 1080 && mousePos.Y > 0 && mousePos.Y < 720)
@@ -539,7 +538,7 @@ namespace ICS4U_Final_Project
                         enemy.HitIndex = i;
                         planeHealth -= 25;
                         userHitBool = true;
-                        timer6.Restart();
+                        timer5.Restart();
                         userDamagePoints = new Vector2(planeLocation.X + 20, planeLocation.Y + 30);
                     }
                 }
@@ -835,7 +834,7 @@ namespace ICS4U_Final_Project
                 _spriteBatch.DrawString(pointNumbers, "+100", coinPoints, Color.Gold);
             if (elapsed4.TotalSeconds < 3 && enemyKillBool == true)
                 _spriteBatch.DrawString(pointNumbers, "+250", killPoints, Color.Gray);
-            if (elapsed6.TotalSeconds < 3 && userHitBool == true)
+            if (elapsed5.TotalSeconds < 3 && userHitBool == true)
                 _spriteBatch.DrawString(pointNumbers, "25", userDamagePoints, Color.DarkRed);
 
             // - boost amount
